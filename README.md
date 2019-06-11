@@ -1,8 +1,12 @@
-# E4 - Enjoyable Elastic Experiment Executor
+# E4 - The enjoyable performance testing framework
 
-Our own testing framework.
+E4 is intended for performance and scale testing web applications with arbitrarily many browser agents running on arbitrarily many "worker nodes" around the globe. 
 
-**Note:** this is work in progress! Expect frequent changes!
+## Disclaimer
+
+This project is work in progress; as is the documentation. We promise it will grow. While E4 is applicable for any web application, it is currently being used and designed as performance testing framework for Atlassian's data center products. This documentation is currently specific still specific to Atlassian applications, and, for now, particularly Confluence. This will change in the future.
+
+**Everything in this documentation may be short-lived because E4 is under active development.**
 
 ## Test Packages
 
