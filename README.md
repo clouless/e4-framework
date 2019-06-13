@@ -21,35 +21,34 @@ Each test package has a set of components that have certain purposes. All source
 #### TestPackage declarator
 
 At the top level is a class that extends `TestPackage`. It defines the following:
-* Virtual Users: a set of simulated users that perform actions against the a running instance
-* Weights: in what relationship should the virtual users be simulated in comparison to vanilla virtual users (i.e. virtual users that have nothing to do with the app)?
+* Virtual Users: a set of simulated users that perform actions against a running application
+* Weights: in what quantities/relations/ratios should virtual users be distributed onto worker threads? 
 * Setup Actions: a set of actions that must be executed before the virtual users can be simulated
-* Weight ratio: defines the ratio between defined app-specific virtual users and vanilla virtual users
 
 #### Virtual User
 
-Classes in the sub-package `virtualusers` that define virtual users. They must define the following:
+Classes in the sub-package `virtualusers` that define virtual users. A virtual user executed a set of actions, each of which can be measured in terms of `time_taken`. The docs of a virtual user should include the following:
 * Assumptions: what is assumed in the environment before the virtual user can be simulated?
 * Preparation: what actions must be performed before the virtual user can be simulated?
-* Actions: what actions are performed by the virtual user. These can involve both Selenium tasks (majority) and REST calls (minority)?
+* Actions: what actions are performed by the virtual user. These can involve both Selenium tasks and REST calls.
 
 #### Action
 
-Classes in the sub-package `actions` that define actions invoked by virtual users. They must define the following:
+Classes in the sub-package `actions` that define actions invoked by virtual users. Actions define what steps should be measured as `time_taken`. This allows to run procedures that are not measured (e.g. login procedures). The docs of an action should include the following:
 * Assumptions: what is assumed in the environment before the action can be executed
-* Procedure: what are the actual procedures performed in the action. These can involve both Selenium tasks (majority) and REST calls (minority).
+* Procedure: what are the actual procedures performed in the action. These can involve both Selenium tasks and REST calls.
 * Result: what is the result if the action was executed successfully
-* Time taken: each action defines how long the part (!) of the action took that should be measured (i.e. not everything in an action must be part of a measurement; e.g. sometimes an action will need to login the user first and that shouldn't count towards the time being measured)
 
 ### How do I test/run/develop a test package?
 
-For development of a test package, create a unit test class in your kotlin test package that extends `TestPackageTestRun`. This class will define the following:
-* BASE_URL: the base url of a running and accessible instance to be used for running the tests
-* OUT_DIR: absolute path to a directory where output can be saved (e.g. Selenium screenshots)
-* USERNAME: username of the application user to be used for testing (e.g. "admin")
-* PASSWORD: password of the application user to be used for testing (e.g. "admin")
+For development of a test package, create a unit test class in your Kotlin test package that extends `TestPackageTestRun`. This class will define the following:
+* BASE_URL: the base url of a running and accessible instance of your app to be used for running the tests
+* IN_DIR (optional): absolute path to a directory where inputs are taken (e.g. files for upload)
+* OUT_DIR (optional): absolute path to a directory where output can be saved (e.g. Selenium screenshots)
+* USERNAME: username of the application user to be used for the test run (e.g. "admin")
+* PASSWORD: password of the application user to be used for the test run (e.g. "admin")
 * TEST_PACKAGE: an instance of your TestPackage declarator class
-* PREPARATION_RUN: boolean indicating if this should be a preparation run. If set to true, only the setup actions of your test package will be executed. If set to false, only the virtual users of your test package will be executed (we found some issues running both in sequence with one execution).
+* PREPARATION_RUN: boolean indicating if this should be a preparation run. If set to true, only the setup actions of your test package will be executed. If set to false, only the virtual users of your test package will be executed (we want to do this differently in the future).
 
 In `@Before` call `super.setup()`. Then, define one `@Test` method like this:
 ```
@@ -77,4 +76,4 @@ Then run the unit test from within the IDE with a running application at the spe
 
 #### Examples
 
-There is a (pretty much) completed test package for the app *Page Branching for Confluence* in the package `de.scandio.e4.testpackages.pagebranching`. It has a `PageBranchingTestPackage` class that is the entry point. The constants need to be adjusted to your environment first (yes, these could be outside the source code but that's more annoying during for development). After the properties are set, the class can be run as a simple unit test from within the IDE.
+There is a (pretty much) completed test package for the app *Page Branching for Confluence* in the package `de.scandio.e4.testpackages.pagebranching`. There is a test package class `PageBranchingTestPackage`. Then, there is a unit test class as described above in `/test` in package `de.scandio.e4.testpackages.pagebranching` named `PageBranchingTestRun`. The constants need to be adjusted to your environment first (yes, these could be outside the source code but that's more annoying during for development). After the properties are set, the class can be run as a simple unit test from within the IDE.
