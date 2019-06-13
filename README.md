@@ -8,6 +8,9 @@ This project is work in progress; as is the documentation. We promise it will gr
 
 **Everything in this documentation may be short-lived because E4 is under active development.**
 
+<img src="doc/e4-tech.png" width="500">
+<img src="doc/e4-map.png" width="800">
+
 ## Test Packages
 
 ### What is a test package?
