@@ -4,7 +4,7 @@ E4 is intended for performance and scale testing web applications with arbitrari
 
 ## Disclaimer
 
-This project is work in progress; as is the documentation. We promise it will grow. While E4 is applicable for any web application, it is currently being used and designed as performance testing framework for Atlassian's data center products. This documentation is currently specific still specific to Atlassian applications, and, for now, particularly Confluence. This will change in the future.
+This project is work in progress; as is the documentation. We promise it will grow. While E4 is applicable for any web application, it is currently being used and designed as performance testing framework for Atlassian's data center products. This documentation is currently still specific to Atlassian applications, and, for now, particularly Confluence. This will change in the future.
 
 **Everything in this documentation may be short-lived because E4 is under active development.**
 
