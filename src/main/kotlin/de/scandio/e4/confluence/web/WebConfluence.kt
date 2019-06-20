@@ -3,6 +3,7 @@ package de.scandio.e4.confluence.web
 import de.scandio.e4.helpers.DomHelper
 import de.scandio.e4.worker.interfaces.WebClient
 import de.scandio.e4.worker.util.RandomData
+import de.scandio.e4.worker.util.WorkerUtils
 import org.apache.commons.io.FileUtils
 import org.openqa.selenium.*
 import org.slf4j.LoggerFactory
@@ -13,13 +14,18 @@ import java.net.URLEncoder
 import java.util.*
 
 class WebConfluence(
-        val driver: WebDriver,
+        var driver: WebDriver,
         val base: URI,
+        val inputDir: String,
         val outputDir: String,
         val username: String,
         val password: String
 ): WebClient {
 
+    // TODO: this is a bit weird because the original driver came from outside in the constructor..
+    override fun refreshDriver() {
+        this.driver = WorkerUtils.newChromeDriver()
+    }
 
     override fun getUser(): String {
         return this.username
@@ -55,7 +61,7 @@ class WebConfluence(
         // Do the following if you want to do it only initially when the browser is opened
         // if (driver.currentUrl.equals("about:blank") || driver.currentUrl.equals("data:,")) { // only login once!
         navigateTo("login.action")
-        dom.awaitElementPresent("form[name='loginform'], .login-section p.last, #main-content", 10)
+        dom.awaitElementPresent("form[name='loginform'], .login-section p.last, #main-content", 20)
         if (dom.isElementPresent("form[name='loginform']")) {
             dom.insertText("#os_username", this.username)
             dom.insertText("#os_password", this.password)
@@ -67,7 +73,7 @@ class WebConfluence(
                     dom.awaitMilliseconds(50)
                 }
             } catch (e: TimeoutException) {
-                dom.click("#grow-intro-video-skip-button", 5)
+                dom.click("#grow-intro-video-skip-button", 20)
                 dom.click("#grow-ic-content button[data-action='skip']")
                 dom.click(".intro-find-spaces-relevant-spaces label:first-child .intro-find-spaces-space")
                 dom.awaitMilliseconds(1000)
@@ -155,7 +161,7 @@ class WebConfluence(
         navigateTo("display/$spaceKey/$blogpostCreationDate/$encodedTitle")
     }
 
-    fun insertMacro(macroId: String, macroSearchTerm: String) {
+    fun openMacroBrowser(macroId: String, macroSearchTerm: String) {
         log.debug("Trying to insert macro {{}}", macroId)
         dom.click("#rte-button-insert")
         debugScreen("insert-macro-1")
@@ -165,10 +171,18 @@ class WebConfluence(
         debugScreen("insert-macro-3")
         dom.click("#macro-$macroId")
         debugScreen("insert-macro-4")
+    }
+
+    fun saveMacroBrowser() {
         dom.click("#macro-details-page button.ok", 5)
         debugScreen("insert-macro-5")
         dom.awaitElementClickable("#rte-button-publish")
-        dom.awaitMilliseconds(100)
+        dom.awaitMilliseconds(50)
+    }
+
+    fun insertMacro(macroId: String, macroSearchTerm: String) {
+        openMacroBrowser(macroId, macroSearchTerm)
+        saveMacroBrowser()
     }
 
     fun debugScreen(snapshotName: String) {
@@ -249,7 +263,8 @@ class WebConfluence(
         log.info("--> SUCCESS")
     }
 
-    fun installPlugin(absoluteFilePath: String) {
+    fun installPlugin(pluginName: String, pluginVersion: String, pluginLicense: String = "", pluginKey: String = "") {
+        val absoluteFilePath = "$inputDir/$pluginName-$pluginVersion.jar"
         log.info("Installing ${absoluteFilePath.split('/').last()}")
         navigateTo("plugins/servlet/upm")
         debugScreen("install-plugin-1")
@@ -268,6 +283,15 @@ class WebConfluence(
         dom.awaitNoClass("#upm-manage-container", "loading", 40)
         debugScreen("install-plugin-6")
         log.info("--> SUCCESS (we think, but please check!)")
+        if (!pluginLicense.isEmpty() && !pluginKey.isEmpty()) {
+            val rowSelector = ".upm-plugin[data-key='$pluginKey']"
+            val licenseSelector = "$rowSelector textarea.edit-license-key"
+            dom.click("#upm-plugin-status-dialog .cancel")
+            dom.insertText(licenseSelector, pluginLicense)
+            dom.awaitSeconds(5) // TODO
+            dom.click("$rowSelector .submit-license")
+            dom.awaitSeconds(5) // TODO
+        }
     }
 
     fun disableMarketplaceConnectivity() {

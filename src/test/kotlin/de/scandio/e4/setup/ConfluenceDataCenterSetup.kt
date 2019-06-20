@@ -1,17 +1,17 @@
 package de.scandio.e4.setup
 
+import de.scandio.e4.BaseSeleniumTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.slf4j.LoggerFactory
 
 
-open class ConfluenceDataCenterSetup : SetupBaseTest() {
+open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
     private val E4_LICENSE_CONF = System.getenv("E4_LICENSE_CONF")
-    private val E4_LICENSE_PAGEBRANCHING = System.getenv("E4_LICENSE_PAGEBRANCHING")
 
     @Before
     fun before() {
@@ -26,11 +26,11 @@ open class ConfluenceDataCenterSetup : SetupBaseTest() {
     @Test
     fun test() {
         try {
-            setupStep1()
+            setupDatabase()
             dom.awaitMinutes(4)
             pollTillDbReady()
             webConfluence.takeScreenshot("db-ready")
-            setupStep2()
+            postDbSetup()
             refreshWebClient(true, true)
 
             /* Step 9: Admin config */
@@ -46,10 +46,9 @@ open class ConfluenceDataCenterSetup : SetupBaseTest() {
             refreshWebClient(true, true)
             webConfluence.disablePlugin("com.atlassian.plugins.base-hipchat-integration-plugin")
             refreshWebClient(true, true)
-            webConfluence.installPlugin("$IN_DIR/$DATA_GENERATOR_JAR_FILENAME")
+            webConfluence.installPlugin("data-generator", "LATEST")
 
             refreshWebClient(true, true)
-            installPageBranching()
         } catch (e: Exception) {
             shot()
             dump()
@@ -59,23 +58,7 @@ open class ConfluenceDataCenterSetup : SetupBaseTest() {
         }
     }
 
-    fun installPageBranching() {
-        val PB_JAR_FILE_PATH = "/tmp/e4/in/page-branching-1.2.0.jar"
-
-        val ROW_SELECTOR = ".upm-plugin[data-key='de.scandio.confluence.plugins.page-branching']"
-        val LICENSE_SELECTOR = "$ROW_SELECTOR textarea.edit-license-key"
-
-        webConfluence.login()
-        webConfluence.authenticateAdmin()
-        webConfluence.installPlugin(PB_JAR_FILE_PATH)
-        dom.click("#upm-plugin-status-dialog .cancel")
-        dom.insertText(LICENSE_SELECTOR, E4_LICENSE_PAGEBRANCHING)
-        dom.awaitSeconds(5)
-        dom.click("$ROW_SELECTOR .submit-license")
-        dom.awaitSeconds(5)
-    }
-
-    fun setupStep1() {
+    fun setupDatabase() {
         driver.navigate().to(BASE_URL) // TODO use webConfluence.navigateTo
         dom.awaitSeconds(3) // just wait a bit for safety
 
@@ -117,7 +100,7 @@ open class ConfluenceDataCenterSetup : SetupBaseTest() {
         shot()
     }
 
-    fun setupStep2() {
+    fun postDbSetup() {
         webConfluence.navigateTo("setup/setupdata-start.action")
         /* Step 6: Setup data */
         dom.click("input[Value='Empty Site']")
@@ -140,18 +123,8 @@ open class ConfluenceDataCenterSetup : SetupBaseTest() {
         dom.click("#grow-intro-create-space")
         dom.awaitSeconds(10)
         webConfluence.navigateTo("logout.action")
-//        dom.click("#onboarding-skip-editor-tutorial")
-//        dom.click("#editor-precursor > .cell")
-//        dom.click("#content-title")
-//        dom.insertText("#content-title", "Test Page")
-//        dom.click("#rte-button-publish")
-//        dom.awaitElementClickable("#main-content")
 
         shot()
-    }
-
-    fun setupStep3() {
-
     }
 
     private fun pollTillDbReady() {

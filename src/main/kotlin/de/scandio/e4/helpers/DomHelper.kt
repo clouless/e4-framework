@@ -53,8 +53,13 @@ class DomHelper(
     }
 
     fun setSelectedOption(selector: String, value: String) {
-        val datasourceSelect = Select(findElement(selector))
-        datasourceSelect.selectByValue(value)
+        val select = Select(findElement(selector))
+        select.selectByValue(value)
+    }
+
+    fun executeScript(script: String) {
+        val js = driver as JavascriptExecutor
+        js.executeScript(script)
     }
 
     fun insertTextCodeMirror(value: String) {

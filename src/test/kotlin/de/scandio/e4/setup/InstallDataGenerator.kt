@@ -1,14 +1,22 @@
 package de.scandio.e4.setup
 
+import de.scandio.e4.BaseSeleniumTest
+import org.junit.After
 import org.junit.Test
 
-class InstallDataGenerator : SetupBaseTest() {
+class InstallDataGenerator : BaseSeleniumTest() {
 
-    val JAR_FILE_PATH = "$IN_DIR/$DATA_GENERATOR_JAR_FILENAME"
+    val PLUGIN_NAME = "data-generator"
+    val PLUGIN_VERSION = "LATEST"
 
     @Test
     fun test() {
-        webConfluence.installPlugin(JAR_FILE_PATH)
+        webConfluence.installPlugin(PLUGIN_NAME, PLUGIN_VERSION)
+    }
+
+    @After
+    fun after() {
+        webConfluence.quit()
     }
 
 }
