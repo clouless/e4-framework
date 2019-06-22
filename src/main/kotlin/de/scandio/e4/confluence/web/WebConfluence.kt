@@ -22,6 +22,11 @@ class WebConfluence(
         val password: String
 ): WebClient {
 
+    constructor(oldWebConfluence: WebConfluence) : this(
+            oldWebConfluence.driver, oldWebConfluence.base, oldWebConfluence.inputDir,
+            oldWebConfluence.outputDir, oldWebConfluence.username, oldWebConfluence.password
+    )
+
     // TODO: this is a bit weird because the original driver came from outside in the constructor..
     override fun refreshDriver() {
         this.driver = WorkerUtils.newChromeDriver()
@@ -100,6 +105,10 @@ class WebConfluence(
         } else {
             log.info("[SELENIUM] Already on page")
         }
+    }
+
+    fun navigateToBaseUrl() {
+        driver.navigate().to(base.toString())
     }
 
     override fun takeScreenshot(screenshotName: String): String {
@@ -202,24 +211,35 @@ class WebConfluence(
         dom.awaitElementInsivible(".search-blanket")
     }
 
-    fun savePage() {
+    fun savePage(): Number {
         dom.removeElementWithJQuery(".aui-blanket")
         dom.click("#rte-button-publish")
         dom.awaitElementPresent("#main-content")
+        return getPageId()
     }
 
-    fun createDefaultPage(pageTitleBeginning: String) {
+    private fun getPageId(): Number {
+        return dom.executeScript("AJS.Meta.get(\"page-id\")").toString().toInt()
+    }
+
+    fun createDefaultPage(pageTitleBeginning: String): Number {
         dom.click("#quick-create-page-button")
         dom.awaitElementPresent("#wysiwyg")
         val pageTitle = "$pageTitleBeginning $username (${Date().time})"
         log.debug("Creating page with title $pageTitle")
-        publishDefaultPage(pageTitle)
+        return publishPage(pageTitle)
     }
 
-    fun createDefaultPage(spaceKey: String, pageTitle: String) {
+    fun createDefaultPage(spaceKey: String, pageTitle: String): Number {
         navigateTo("pages/createpage.action?spaceKey=$spaceKey")
         dom.awaitElementPresent("#wysiwyg")
-        publishDefaultPage(pageTitle)
+        return publishPage(pageTitle)
+    }
+
+    fun createCustomPage(spaceKey: String, pageTitle: String, pageContentHtml: String): Number {
+        navigateTo("pages/createpage.action?spaceKey=$spaceKey")
+        dom.awaitElementPresent("#wysiwyg")
+        return publishPage(pageTitle, pageContentHtml)
     }
 
     private fun setPageTitleInEditor(pageTitle: String) {
@@ -227,14 +247,18 @@ class WebConfluence(
         dom.insertText("#content-title", pageTitle)
     }
 
-    private fun publishDefaultPage(pageTitle: String) {
+    private fun publishPage(pageTitle: String, pageContentHtml: String = ""): Number {
+        var html = pageContentHtml
+        if (html.isEmpty()) {
+            html = "<h1>Lorem Ipsum</h1><p>${RandomData.STRING_LOREM_IPSUM}</p>"
+        }
         if (dom.isElementPresent("#closeDisDialog")) {
             dom.click("#closeDisDialog")
             dom.awaitMilliseconds(100)
         }
         setPageTitleInEditor(pageTitle)
-        dom.addTextTinyMce("<h1>Lorem Ipsum</h1><p>${RandomData.STRING_LOREM_IPSUM}</p>")
-        savePage()
+        dom.addTextTinyMce(html)
+        return savePage()
     }
 
     fun createEmptySpace(spaceKey: String, spaceName: String) {

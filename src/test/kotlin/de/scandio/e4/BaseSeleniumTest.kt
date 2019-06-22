@@ -1,5 +1,7 @@
 package de.scandio.e4
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.LoggerContext
 import de.scandio.e4.helpers.DomHelper
 import de.scandio.e4.confluence.web.WebConfluence
 import de.scandio.e4.worker.confluence.rest.RestConfluence
@@ -16,8 +18,8 @@ open abstract class BaseSeleniumTest {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-//    protected var BASE_URL = "http://confluence-cluster-6153-lb:26153/"
-    protected var BASE_URL = "http://e4-test:8090/"
+    protected var BASE_URL = "http://confluence-cluster-6153-lb:26153/"
+//    protected var BASE_URL = "http://e4-test:8090/"
     protected val OUT_DIR = "/tmp/e4/out"
     protected val IN_DIR = "/tmp/e4/in"
     protected val USERNAME = "admin"
@@ -47,6 +49,9 @@ open abstract class BaseSeleniumTest {
         this.dom.screenshotBeforeInsert = true
         this.webConfluence = WebConfluence(driver, URI(BASE_URL), IN_DIR, OUT_DIR, USERNAME, PASSWORD)
         this.restConfluence = RestConfluence(BASE_URL, USERNAME, PASSWORD)
+
+        val loggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
+        loggerContext.getLogger("org.apache").level = Level.WARN
     }
 
     open fun refreshWebClient(login: Boolean = false, authenticate: Boolean = false) {

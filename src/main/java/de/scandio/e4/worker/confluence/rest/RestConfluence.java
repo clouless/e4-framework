@@ -1,11 +1,10 @@
 package de.scandio.e4.worker.confluence.rest;
 
 import com.google.gson.Gson;
-import de.scandio.e4.client.config.ClientConfig;
 import de.scandio.e4.worker.interfaces.RestClient;
 import de.scandio.e4.worker.util.WorkerUtils;
 import org.apache.commons.codec.binary.Base64;
-import org.jetbrains.annotations.NotNull;
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -15,7 +14,6 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -87,10 +85,19 @@ public class RestConfluence implements RestClient {
 		return usernames;
 	}
 
-	public String createPage(String pageTitle, String spaceKey, String content, String parentPageId) {
-		String bodyTemplate = "{\"type\":\"page\",\"ancestors\":[{\"id\":%s}]\"title\":\"%s\",\"space\":{\"key\":\"%s\"},\"body\":{\"storage\":{\"value\":\"%s\",\"representation\":\"storage\"}}}";
+	public String createPage(String spaceKey, String pageTitle, String content, String parentPageTitle) {
+		content = StringEscapeUtils.escapeJson(content);
+		long parentPageId = getPageId(spaceKey, parentPageTitle);
+//		String bodyTemplate = "{\"type\":\"page\",\"title\":\"%s\",\"space\":{\"key\":\"%s\"},\"body\":{\"storage\":{\"value\":\"%s\",\"representation\":\"storage\"}}}";
+		String bodyTemplate = "{\"type\":\"page\",\"ancestors\":[{\"id\":%s}],\"title\":\"%s\",\"space\":{\"key\":\"%s\"},\"body\":{\"storage\":{\"value\":\"%s\",\"representation\":\"storage\"}}}";
 		String body = String.format(bodyTemplate, parentPageId, pageTitle, spaceKey, content);
-		return sendPostRequest("content/", body);
+		return sendPostRequest("rest/api/content/", body);
+	}
+
+	public Long getPageId(String spaceKey, String pageTitle) {
+		String responseText = findPage(spaceKey, pageTitle);
+		List<Map> pages = getResultListFromResponse(responseText);
+		return Long.parseLong((String) pages.get(0).get("id"));
 	}
 
 	public String createSpace(String spaceKey, String spaceName) {
@@ -99,6 +106,12 @@ public class RestConfluence implements RestClient {
 		String bodyTemplate = "{\"key\":\"TST\",\"name\":\"Example space\",\"description\":{\"plain\":{\"value\":\"This is an example space\",\"representation\":\"plain\"}},\"metadata\":{}}";
 		String body = String.format(bodyTemplate, spaceKey, spaceName, spaceDesc);
 		return sendPostRequest("rest/api/content/", body);
+	}
+
+	private List<Map> getResultListFromResponse(String responseText) {
+		Map<String, Object> response = GSON.fromJson(responseText, Map.class);
+		List<Map> pageObjects = (ArrayList) response.get("results");
+		return pageObjects;
 	}
 
 	private String sendPostRequest(String urlAfterBaseUrl, String body) {

@@ -57,9 +57,9 @@ class DomHelper(
         select.selectByValue(value)
     }
 
-    fun executeScript(script: String) {
+    fun executeScript(script: String): Any {
         val js = driver as JavascriptExecutor
-        js.executeScript(script)
+        return js.executeScript(script)
     }
 
     fun insertTextCodeMirror(value: String) {
