@@ -16,12 +16,10 @@ class LivelyThemeTestRun : TestPackageTestRun() {
     private val USERNAME = "admin"
     private val PASSWORD = "admin"
     private val TEST_PACKAGE = LivelyThemeTestPackage()
-    private val PREPARATION_RUN = false
+    private val PREPARATION_RUN = true
 
     val DASHBOARD_CONTENT = """
-<ac:layout><ac:layout-section ac:type="two_equal"><ac:layout-cell>
-<p><ac:structured-macro ac:name="recently-updated" ac:schema-version="1" ac:macro-id="26d1ebca-3c09-401c-b940-4a76ac59feeb" /></p></ac:layout-cell><ac:layout-cell>
-<p><ac:structured-macro ac:name="blog-posts" ac:schema-version="1" ac:macro-id="29ac3193-cda9-459d-9db9-ee82e5d1687c" /></p></ac:layout-cell></ac:layout-section></ac:layout>
+        <p><ac:structured-macro ac:name="recently-updated" ac:schema-version="1" ac:macro-id="c148d3ff-5eb4-4e63-b7d1-4b27ae7b3689"><ac:parameter ac:name="max">40</ac:parameter><ac:parameter ac:name="hideHeading">true</ac:parameter><ac:parameter ac:name="theme">social</ac:parameter></ac:structured-macro></p>
     """.trimIndent()
 
     @Before

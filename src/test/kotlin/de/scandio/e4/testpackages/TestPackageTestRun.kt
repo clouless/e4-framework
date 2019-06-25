@@ -3,10 +3,12 @@ package de.scandio.e4.testpackages
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
 import de.scandio.e4.confluence.web.WebConfluence
+import de.scandio.e4.worker.client.NoopWebClient
 import de.scandio.e4.worker.collections.ActionCollection
 import de.scandio.e4.worker.confluence.rest.RestConfluence
 import de.scandio.e4.worker.interfaces.Action
 import de.scandio.e4.worker.interfaces.TestPackage
+import de.scandio.e4.worker.interfaces.WebClient
 import de.scandio.e4.worker.util.Util
 import de.scandio.e4.worker.util.WorkerUtils
 import org.openqa.selenium.Dimension
@@ -82,8 +84,13 @@ abstract class TestPackageTestRun {
         var numExcludedActions = 0
         var numActionsRun = 0
         for (action in actions) {
-            val webConfluence = WorkerUtils.newChromeWebClientPreparePhase(
-                    getBaseUrl(), getInDir(), getOutDir(), getUsername(), getPassword()) as WebConfluence
+            var webConfluence: WebClient
+            if (actions.allRestOnly()) {
+                webConfluence = NoopWebClient()
+            } else {
+                webConfluence = WorkerUtils.newChromeWebClientPreparePhase(
+                        getBaseUrl(), getInDir(), getOutDir(), getUsername(), getPassword()) as WebConfluence
+            }
             val restConfluence = RestConfluence(getBaseUrl(), getUsername(), getPassword())
             try {
                 log.info("Executing action ${action.javaClass.simpleName}")

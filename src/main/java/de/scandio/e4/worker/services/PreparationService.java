@@ -3,6 +3,7 @@ package de.scandio.e4.worker.services;
 import de.scandio.e4.client.config.WorkerConfig;
 import de.scandio.e4.dto.PreparationStatus;
 import de.scandio.e4.dto.TestsStatus;
+import de.scandio.e4.worker.client.NoopWebClient;
 import de.scandio.e4.worker.collections.ActionCollection;
 import de.scandio.e4.worker.confluence.rest.RestConfluence;
 import de.scandio.e4.worker.interfaces.Action;
@@ -66,7 +67,14 @@ public class PreparationService {
             }
             userCredentialsService.storeUsers(userCredentials);
             if (!setupScenarios.isEmpty()) {
-				final WebClient webClient = WorkerUtils.newChromeWebClientPreparePhase(config.getTarget(), applicationStatusService.getInputDir(), applicationStatusService.getOutputDir(), config.getUsername(), config.getPassword());
+            	WebClient webClient;
+            	if (!setupScenarios.allRestOnly()) {
+					webClient = new NoopWebClient();
+				} else {
+					webClient = WorkerUtils.newChromeWebClientPreparePhase(
+							config.getTarget(), applicationStatusService.getInputDir(),
+							applicationStatusService.getOutputDir(), config.getUsername(), config.getPassword());
+				}
 				try {
 					for (Action action : setupScenarios) {
 						try {

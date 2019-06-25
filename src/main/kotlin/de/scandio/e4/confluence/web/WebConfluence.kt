@@ -12,6 +12,7 @@ import java.lang.Exception
 import java.net.URI
 import java.net.URLEncoder
 import java.util.*
+import kotlin.collections.HashMap
 
 class WebConfluence(
         var driver: WebDriver,
@@ -80,7 +81,7 @@ class WebConfluence(
             } catch (e: TimeoutException) {
                 dom.click("#grow-intro-video-skip-button", 20)
                 dom.click("#grow-ic-content button[data-action='skip']")
-                dom.click(".intro-find-spaces-relevant-spaces label:first-child .intro-find-spaces-space")
+                dom.click(".intro-find-spaces-relevant-spaces text:first-child .intro-find-spaces-space")
                 dom.awaitMilliseconds(1000)
                 dom.click(".intro-find-spaces-button-continue")
                 dom.awaitElementPresent(".pagebody", 20)
@@ -172,25 +173,36 @@ class WebConfluence(
 
     fun openMacroBrowser(macroId: String, macroSearchTerm: String) {
         log.debug("Trying to insert macro {{}}", macroId)
+        driver.switchTo().frame("wysiwygTextarea_ifr")
+        debugScreen("openMacroBrowser-0")
+        dom.click("#tinymce")
+        driver.switchTo().parentFrame()
         dom.click("#rte-button-insert")
-        debugScreen("insert-macro-1")
+        debugScreen("openMacroBrowser-1")
         dom.click("#rte-insert-macro")
-        debugScreen("insert-macro-2")
+        debugScreen("openMacroBrowser-2")
         dom.insertText("#macro-browser-search", macroSearchTerm)
-        debugScreen("insert-macro-3")
+        debugScreen("openMacroBrowser-3")
         dom.click("#macro-$macroId")
-        debugScreen("insert-macro-4")
+        debugScreen("openMacroBrowser-4")
     }
 
     fun saveMacroBrowser() {
         dom.click("#macro-details-page button.ok", 5)
-        debugScreen("insert-macro-5")
+        debugScreen("saveMacroBrowser-1")
         dom.awaitElementClickable("#rte-button-publish")
         dom.awaitMilliseconds(50)
     }
 
-    fun insertMacro(macroId: String, macroSearchTerm: String) {
+    fun insertMacro(macroId: String, macroSearchTerm: String, macroParameters: Map<String, String> = emptyMap()) {
         openMacroBrowser(macroId, macroSearchTerm)
+        debugScreen("after-openMacroBrowser")
+        if (!macroParameters.isEmpty()) {
+            for ((paramKey, paramValue) in macroParameters) {
+                dom.insertText("#macro-browser-dialog #macro-param-$paramKey", paramValue)
+            }
+        }
+        debugScreen("after-setParams")
         saveMacroBrowser()
     }
 
@@ -211,43 +223,42 @@ class WebConfluence(
         dom.awaitElementInsivible(".search-blanket")
     }
 
-    fun savePage(): Number {
+    fun savePage() {
         dom.removeElementWithJQuery(".aui-blanket")
         dom.click("#rte-button-publish")
         dom.awaitElementPresent("#main-content")
-        return getPageId()
     }
 
     private fun getPageId(): Number {
         return dom.executeScript("AJS.Meta.get(\"page-id\")").toString().toInt()
     }
 
-    fun createDefaultPage(pageTitleBeginning: String): Number {
+    fun createDefaultPage(pageTitleBeginning: String) {
         dom.click("#quick-create-page-button")
         dom.awaitElementPresent("#wysiwyg")
         val pageTitle = "$pageTitleBeginning $username (${Date().time})"
         log.debug("Creating page with title $pageTitle")
-        return publishPage(pageTitle)
+        publishPage(pageTitle)
     }
 
-    fun createDefaultPage(spaceKey: String, pageTitle: String): Number {
+    fun createDefaultPage(spaceKey: String, pageTitle: String) {
         navigateTo("pages/createpage.action?spaceKey=$spaceKey")
         dom.awaitElementPresent("#wysiwyg")
-        return publishPage(pageTitle)
+        publishPage(pageTitle)
     }
 
-    fun createCustomPage(spaceKey: String, pageTitle: String, pageContentHtml: String): Number {
+    fun createCustomPage(spaceKey: String, pageTitle: String, pageContentHtml: String) {
         navigateTo("pages/createpage.action?spaceKey=$spaceKey")
         dom.awaitElementPresent("#wysiwyg")
-        return publishPage(pageTitle, pageContentHtml)
+        publishPage(pageTitle, pageContentHtml)
     }
 
-    private fun setPageTitleInEditor(pageTitle: String) {
+    fun setPageTitleInEditor(pageTitle: String) {
         dom.click("#content-title-div")
         dom.insertText("#content-title", pageTitle)
     }
 
-    private fun publishPage(pageTitle: String, pageContentHtml: String = ""): Number {
+    private fun publishPage(pageTitle: String, pageContentHtml: String = "") {
         var html = pageContentHtml
         if (html.isEmpty()) {
             html = "<h1>Lorem Ipsum</h1><p>${RandomData.STRING_LOREM_IPSUM}</p>"
@@ -258,7 +269,7 @@ class WebConfluence(
         }
         setPageTitleInEditor(pageTitle)
         dom.addTextTinyMce(html)
-        return savePage()
+        savePage()
     }
 
     fun createEmptySpace(spaceKey: String, spaceName: String) {
@@ -310,6 +321,7 @@ class WebConfluence(
         if (!pluginLicense.isEmpty() && !pluginKey.isEmpty()) {
             val rowSelector = ".upm-plugin[data-key='$pluginKey']"
             val licenseSelector = "$rowSelector textarea.edit-license-key"
+            dom.awaitElementClickable(licenseSelector)
             dom.click("#upm-plugin-status-dialog .cancel")
             dom.insertText(licenseSelector, pluginLicense)
             dom.awaitSeconds(5) // TODO

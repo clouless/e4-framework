@@ -189,4 +189,19 @@ class DomHelper(
         )
         awaitMilliseconds(10)
     }
+
+    fun clickAll(selector: String) {
+        for (element in findElements(selector)) {
+            click(element)
+            awaitMilliseconds(50)
+        }
+    }
+
+    fun unselectAll(selector: String) {
+        for (element in findElements(selector)) {
+            if (element.isSelected) {
+                element.click()
+            }
+        }
+    }
 }

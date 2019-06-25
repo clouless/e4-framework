@@ -22,7 +22,7 @@ class PocketQueryConfTestPackage: TestPackage {
 
     override fun getSetupActions(): ActionCollection {
         val actions = ActionCollection()
-        actions.add(InstallPluginAction("pocketquery", "3.9.2"))
+        actions.add(InstallPluginAction("pocketquery", "3.9.2", "", ""))
 
         return actions
     }

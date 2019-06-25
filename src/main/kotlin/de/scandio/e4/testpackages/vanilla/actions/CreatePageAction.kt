@@ -11,7 +11,6 @@ class CreatePageAction(
         val spaceKey: String,
         var pageTitle: String,
         var pageContent: String = "",
-        var parentPageTitle: String = "",
         var useRest: Boolean = false,
         var appendUsernameToPageTitle: Boolean = false,
         var appendTimestampToPageTitle: Boolean = false
@@ -21,27 +20,29 @@ class CreatePageAction(
     private var end: Long = 0
 
     override fun execute(webClient: WebClient, restClient: RestClient) {
-        val webConfluence = webClient as WebConfluence
-        val restConfluence = restClient as RestConfluence
+        val username = restClient.user
         if (appendUsernameToPageTitle) {
-            pageTitle += " (${webClient.username})"
+            pageTitle += " ($username)"
         }
 
         if (appendTimestampToPageTitle) {
             pageTitle += " (${Date().time})"
         }
 
-        if (!useRest) {
-            webConfluence.login()
-        }
 
-        this.start = Date().time
-        if (pageContent.isEmpty()) {
-            webConfluence.createDefaultPage(spaceKey, pageTitle)
-        } else if (useRest) {
-            restConfluence.createPage(spaceKey, pageTitle, pageContent, parentPageTitle)
+        if (useRest) {
+            val restConfluence = restClient as RestConfluence
+            this.start = Date().time
+            restConfluence.createPage(spaceKey, pageTitle, pageContent)
         } else {
-            webConfluence.createCustomPage(spaceKey, pageTitle, pageContent)
+            val webConfluence = webClient as WebConfluence
+            webConfluence.login()
+            this.start = Date().time
+            if (pageContent.isEmpty()) {
+                webConfluence.createDefaultPage(spaceKey, pageTitle)
+            } else {
+                webConfluence.createCustomPage(spaceKey, pageTitle, pageContent)
+            }
         }
 
         this.end = Date().time
@@ -51,5 +52,8 @@ class CreatePageAction(
         return this.end - this.start
     }
 
+    override fun isRestOnly(): Boolean {
+        return useRest
+    }
 
 }
