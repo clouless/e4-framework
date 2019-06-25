@@ -1,0 +1,9 @@
+The approval process for our data center apps has given us a few headaches recently. After some talking in the vendor community and our own experiences with the existing frameworks we decided to build our own solution, named E4.
+
+The problems we faced with existing frameworks were mostly about transparency and versatility: firstly, we became constantly nervous about not knowing exactly what was going on under the hood (only seeing AWS bills is unsatisfying). Secondly, the means to simulate user interaction for our apps they provided were insufficient (either REST only or Selenium only).
+
+E4 provides this transparency and versatility: testers will see exactly what's going on and can decide flexibly between REST and Selenium. E4 can be deployed with arbitrarily many distributed worker nodes simulating real users. In this talk we will tell our story and demonstrate how to use E4.
+
+E4 is open source and actively developed:
+https://github.com/scandio/e4-framework
+

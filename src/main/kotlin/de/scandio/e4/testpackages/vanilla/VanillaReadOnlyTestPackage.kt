@@ -14,12 +14,9 @@ class VanillaReadOnlyTestPackage: TestPackage {
 
     override fun getVirtualUsers(): VirtualUserCollection {
         val virtualUsers = VirtualUserCollection()
-        virtualUsers.add(Reader::class.java, 0.08)
-        virtualUsers.add(Reader::class.java, 0.36)
-        virtualUsers.add(Reader::class.java, 0.08)
-        virtualUsers.add(Reader::class.java, 0.16)
-        virtualUsers.add(Reader::class.java, 0.16)
-        virtualUsers.add(Reader::class.java, 0.16)
+        virtualUsers.add(Searcher::class.java, 0.16)
+        virtualUsers.add(Reader::class.java, 0.68)
+        virtualUsers.add(Dashboarder::class.java, 0.16)
         return virtualUsers
     }
 
