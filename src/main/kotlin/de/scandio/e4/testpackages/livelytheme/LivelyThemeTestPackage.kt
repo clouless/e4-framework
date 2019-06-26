@@ -1,5 +1,6 @@
 package de.scandio.e4.testpackages.livelytheme
 
+import de.scandio.e4.testpackages.livelytheme.actions.CreateLivelyThemeMacroPage
 import de.scandio.e4.testpackages.vanilla.actions.*
 import de.scandio.e4.testpackages.vanilla.virtualusers.*
 import de.scandio.e4.worker.collections.ActionCollection
@@ -42,7 +43,7 @@ class LivelyThemeTestPackage: TestPackage {
 //        actions.add(SetupLivelyThemeMacroPages("LT", "macros", 100, MACRO_PAGES))
 
 
-        actions.add(ViewRandomContent("LT", "macros"))
+        actions.add(CreateLivelyThemeMacroPage("LT", MACRO_IDS_AND_NAMES))
         return actions
     }
 
@@ -60,6 +61,15 @@ class LivelyThemeTestPackage: TestPackage {
     val LICENSE = System.getenv("E4_LICENSE_LIVELY_THEME")
 
     val PLUGIN_KEY = "de.scandio.confluence.plugins.lively-theme"
+
+    val MACRO_IDS_AND_NAMES = mapOf(
+            "lively-button" to "Button",
+            "lively-column-width" to "Column Width",
+            "lively-widget" to "Widget",
+            "lively-menu" to "Menu",
+            "lively-list" to "List",
+            "lively-margin" to "Margin"
+    )
 
     val MACRO_PAGES = mapOf(
             "lively-button" to "<ac:structured-macro ac:name=\"lively-button\" ac:schema-version=\"1\"><ac:parameter ac:name=\"link\"><ac:link><ri:page ri:content-title=\"Lively Theme Home\" /></ac:link></ac:parameter><ac:parameter ac:name=\"text\">My Button</ac:parameter></ac:structured-macro>",

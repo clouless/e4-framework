@@ -18,8 +18,8 @@ open abstract class BaseSeleniumTest {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    protected var BASE_URL = "http://confluence-cluster-6153-lb:26153/"
-//    protected var BASE_URL = "http://e4-test:8090/"
+//    protected var BASE_URL = "http://confluence-cluster-6153-lb:26153/"
+    protected var BASE_URL = "http://e4-test:8090/"
     protected val OUT_DIR = "/tmp/e4/out"
     protected val IN_DIR = "/tmp/e4/in"
     protected val USERNAME = "admin"

@@ -6,6 +6,7 @@ import de.scandio.e4.worker.util.RandomData
 import de.scandio.e4.worker.util.WorkerUtils
 import org.apache.commons.io.FileUtils
 import org.openqa.selenium.*
+import org.openqa.selenium.interactions.Actions
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.lang.Exception
@@ -396,6 +397,35 @@ class WebConfluence(
             dom.click(selector)
         }
         dom.click(".primary-button-container input[type='submit']")
+    }
+
+    fun insertMacroBody(macroId: String, htmlBody: String) {
+        dom.insertHtmlInEditor(".wysiwyg-macro[data-macro-name='$macroId']", htmlBody)
+    }
+
+    fun actionBuilder(): Actions {
+        return Actions(driver)
+    }
+
+    fun simulateBulletList(bulletPoints: Array<String>) {
+        val actions = Actions(driver)
+        bulletPoints.forEach {
+            actions.sendKeys(it).sendKeys(Keys.RETURN)
+        }
+        actions.perform()
+    }
+
+    fun simulateText(text: String) {
+        Actions(driver).sendKeys(text).perform()
+    }
+
+    fun focusEditor() {
+        driver.switchTo().frame("wysiwygTextarea_ifr")
+        dom.click("#tinymce")
+    }
+
+    fun unfocusEditor() {
+        driver.switchTo().parentFrame()
     }
 
 }

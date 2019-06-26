@@ -204,4 +204,10 @@ class DomHelper(
             }
         }
     }
+
+    fun insertHtmlInEditor(containerSelector: String, html: String) {
+        driver.switchTo().frame("wysiwygTextarea_ifr")
+        executeScript("$('$containerSelector').html('$html');")
+        driver.switchTo().parentFrame()
+    }
 }
