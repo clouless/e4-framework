@@ -1,7 +1,6 @@
 package de.scandio.e4.testpackages.livelytheme
 
-import de.scandio.e4.testpackages.livelytheme.actions.CreateLivelyThemeMacroPage
-import de.scandio.e4.testpackages.vanilla.actions.*
+import de.scandio.e4.testpackages.livelytheme.actions.SetRandomCustomElement
 import de.scandio.e4.testpackages.vanilla.virtualusers.*
 import de.scandio.e4.worker.collections.ActionCollection
 import de.scandio.e4.worker.interfaces.TestPackage
@@ -30,7 +29,7 @@ class LivelyThemeTestPackage: TestPackage {
         val actions = ActionCollection()
 //        actions.add(InstallPluginAction("lively-theme", "3.1.1", LICENSE, PLUGIN_KEY))
 //        actions.add(SetThemeAction("lively-theme"))
-//        actions.add(ThemeSettingsAction())
+        actions.add(SetRandomCustomElement("LT", "Lively Theme Home"))
 //
 //        actions.add(CreateSpaceAction("LT", "Lively Theme", true))
 //        actions.add(CreatePageAction("LT", "dashboard", DASHBOARD_CONTENT, true))
@@ -43,7 +42,7 @@ class LivelyThemeTestPackage: TestPackage {
 //        actions.add(SetupLivelyThemeMacroPages("LT", "macros", 100, MACRO_PAGES))
 
 
-        actions.add(CreateLivelyThemeMacroPage("LT", MACRO_IDS_AND_NAMES))
+//        actions.add(CreateLivelyThemeMacroPage("LT", MACRO_IDS_AND_NAMES))
         return actions
     }
 

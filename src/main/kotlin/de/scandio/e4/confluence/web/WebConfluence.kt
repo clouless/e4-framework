@@ -164,6 +164,10 @@ class WebConfluence(
     fun goToEditPage() {
         dom.awaitElementClickable("#editPageLink")
         dom.click("#editPageLink")
+        awaitEditPageLoaded()
+    }
+
+    fun awaitEditPageLoaded() {
         dom.awaitElementClickable("#content-title-div", 40)
     }
 
@@ -200,7 +204,13 @@ class WebConfluence(
         debugScreen("after-openMacroBrowser")
         if (!macroParameters.isEmpty()) {
             for ((paramKey, paramValue) in macroParameters) {
-                dom.insertText("#macro-browser-dialog #macro-param-$paramKey", paramValue)
+                val selector = "#macro-browser-dialog #macro-param-$paramKey"
+                val elem = dom.findElement(selector)
+                if ("select".equals(elem.tagName)) {
+                    dom.setSelectedOption(selector, paramValue)
+                } else {
+                    dom.insertText(selector, paramValue)
+                }
             }
         }
         debugScreen("after-setParams")
@@ -422,10 +432,20 @@ class WebConfluence(
     fun focusEditor() {
         driver.switchTo().frame("wysiwygTextarea_ifr")
         dom.click("#tinymce")
+        driver.switchTo().parentFrame()
     }
 
-    fun unfocusEditor() {
-        driver.switchTo().parentFrame()
+    fun setTwoColumnLayout() {
+        dom.click("#page-layout-2")
+        dom.click("#pagelayout2-toolbar > button:nth-child(2)")
+    }
+
+    fun goToDashboard() {
+        navigateTo("dashboard.action")
+    }
+
+    fun clearEditorContent() {
+        dom.insertTextTinyMce("")
     }
 
 }

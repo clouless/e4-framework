@@ -17,7 +17,7 @@ open class ViewDashboardAction : Action() {
         val dom = DomHelper(webConfluence.driver)
         webConfluence.login()
         this.start = Date().time
-        webConfluence.navigateTo("dashboard.action")
+        webConfluence.goToDashboard()
         dom.awaitElementPresent("#page")
         this.end = Date().time
     }

@@ -105,11 +105,18 @@ class DomHelper(
         wait(ExpectedConditions.attributeContains(By.cssSelector(selector), "value", value))
     }
 
-    fun insertText(selector: String, text: String, awaitClickableSeconds: Long = this.defaultWaitTillPresent) {
+    fun awaitSelected(selector: String) {
+        wait(ExpectedConditions.elementToBeSelected(By.cssSelector(selector)))
+    }
+
+    fun insertText(selector: String, text: String, clearText: Boolean = false) {
         if (this.screenshotBeforeInsert) {
             this.util.takeScreenshot(driver, "$outDir/insert-$selector.png")
         }
-        awaitElementPresent(selector, awaitClickableSeconds)
+        awaitElementPresent(selector)
+        if (clearText) {
+            clearText(selector)
+        }
         findElement(selector).sendKeys(text)
         awaitMilliseconds(50)
     }

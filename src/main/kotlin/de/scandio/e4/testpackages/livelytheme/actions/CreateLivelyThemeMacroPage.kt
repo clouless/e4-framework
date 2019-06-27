@@ -66,24 +66,9 @@ open class CreateLivelyThemeMacroPage (
             }
             "lively-column-width" -> {
                 webConfluence.focusEditor()
-                webConfluence.unfocusEditor()
-                dom.click("#page-layout-2")
-                dom.click("#pagelayout2-toolbar > button:nth-child(2)")
-//                webConfluence.takeScreenshot("column-width-1")
-//                webConfluence.focusEditor()
-//                webConfluence.takeScreenshot("column-width-2")
-//                webConfluence.focusEditor()
-//                dom.click(".cell:first-child")
-//                webConfluence.unfocusEditor()
-//                webConfluence.takeScreenshot("column-width-3")
-//                dom.awaitMilliseconds(50)
-//                webConfluence.takeScreenshot("column-width-4")
+                webConfluence.setTwoColumnLayout()
+                webConfluence.simulateText("COLUMN")
                 insertLivelyMacro(macroId, mapOf("width" to "300px"))
-//                webConfluence.actionBuilder().sendKeys("LEFT").sendKeys(Keys.RETURN).perform()
-                insertLivelyMacro(macroId, mapOf("width" to "200px"))
-//                webConfluence.actionBuilder().sendKeys(Keys.TAB).sendKeys("RIGHT").perform()
-//                webConfluence.takeScreenshot("column-width-5")
-//                webConfluence.unfocusEditor()
             }
         }
         webConfluence.savePage()
@@ -93,18 +78,6 @@ open class CreateLivelyThemeMacroPage (
     fun insertLivelyMacro(macroId: String, macroParameters: Map<String, String> = emptyMap()) {
         webConfluence!!.insertMacro(macroId, macros[macroId]!!, macroParameters)
     }
-
-//    fun createMacroPage(spaceKey: String, pageTitle: String, macroId: String, macroName: String,
-//                        macroParameters: HashMap<String, String>) {
-//        val webConfluence = this.webConfluence!!
-//        val dom = webConfluence.dom
-//        webConfluence.navigateTo("pages/createpage.action?spaceKey=$spaceKey")
-//        dom.awaitElementPresent("#wysiwyg")
-//        dom.click("#wysiwyg")
-//        setPageTitleInEditor(pageTitle)
-//        insertMacro(macroId, macroName, macroParameters)
-//        savePage()
-//    }
 
     override fun getTimeTaken(): Long {
         return this.end - this.start

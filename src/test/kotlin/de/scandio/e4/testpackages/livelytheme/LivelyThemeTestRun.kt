@@ -1,4 +1,4 @@
-package de.scandio.e4.testpackages.pagebranching
+package de.scandio.e4.testpackages.livelytheme
 
 import de.scandio.e4.testpackages.TestPackageTestRun
 import de.scandio.e4.testpackages.livelytheme.LivelyThemeTestPackage
