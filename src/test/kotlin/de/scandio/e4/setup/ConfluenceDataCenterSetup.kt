@@ -1,6 +1,7 @@
 package de.scandio.e4.setup
 
 import de.scandio.e4.BaseSeleniumTest
+import de.scandio.e4.testpackages.livelytheme.LivelyThemeTestPackage
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -12,6 +13,14 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
     private val log = LoggerFactory.getLogger(javaClass)
 
     private val E4_LICENSE_CONF = System.getenv("E4_LICENSE_CONF")
+
+    private fun runTestPackageSystemSetup() {
+        val testPackage = LivelyThemeTestPackage()
+        for (action in testPackage.getSystemSetupActions()) {
+            refreshWebClient(true, true)
+            action.execute(webConfluence, restConfluence)
+        }
+    }
 
     @Before
     fun before() {
@@ -26,13 +35,13 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
     @Test
     fun test() {
         try {
-//            setupDatabase()
-//            pollTillDbReady()
-//            webConfluence.takeScreenshot("db-ready")
-//            postDbSetup()
-            refreshWebClient(true, true)
+            setupDatabase()
+            pollTillDbReady()
+            webConfluence.takeScreenshot("db-ready")
+            postDbSetup()
 
             /* Step 9: Admin config */
+            refreshWebClient(true, true)
             webConfluence.disableMarketplaceConnectivity()
             refreshWebClient(true, true)
             webConfluence.disableSecureAdminSessions()
@@ -46,6 +55,8 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
             webConfluence.disablePlugin("com.atlassian.plugins.base-hipchat-integration-plugin")
             refreshWebClient(true, true)
             webConfluence.installPlugin("data-generator", "LATEST")
+
+            runTestPackageSystemSetup()
 
         } catch (e: Exception) {
             shot()
@@ -116,11 +127,12 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
 
 
         dom.click(".setup-success-button .aui-button-primary.finishAction")
+        dom.awaitSeconds(10)
 
-//        dom.insertText("#grow-intro-space-name", "TEST")
-//        dom.click("#grow-intro-create-space")
-//        dom.awaitSeconds(10)
-//        webConfluence.navigateTo("logout.action")
+        dom.insertText("#grow-intro-space-name", "TEST")
+        dom.click("#grow-intro-create-space")
+        dom.awaitSeconds(10)
+        webConfluence.navigateTo("logout.action")
 
         shot()
     }
@@ -136,8 +148,8 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
                 log.info("+++++++++++++++++++++++++++++++++++++++++!")
                 log.info("+++++++++++ Done with DB Setup ++++++++++!")
                 log.info("+++++++++++++++++++++++++++++++++++++++++!")
-                log.info("But waiting for another safety minute because the setup wizard is buggy...")
-                dom.awaitMinutes(1)
+//                log.info("But waiting for another safety minute because the setup wizard is buggy...")
+//                dom.awaitMinutes(1)
                 break
             }
 

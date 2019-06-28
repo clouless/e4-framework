@@ -28,13 +28,8 @@ public class WorkerUtils {
 
 	public static WebClient newChromeWebClient(String targetUrl, String inputDir, String outputDir, String username, String password) throws Exception {
 		WebDriver driver = newChromeDriver();
+		driver.manage().window().setSize(new Dimension(2000, 1500));
 		return new WebConfluence(driver, new URI(targetUrl), inputDir, outputDir, username, password);
-	}
-
-	public static WebClient newChromeWebClientPreparePhase(String targetUrl, String inputDir, String outputDir, String username, String password) throws Exception {
-		WebClient webClient = newChromeWebClient(targetUrl, inputDir, outputDir, username, password);
-		webClient.getWebDriver().manage().window().setSize(new Dimension(2000, 1500));
-		return webClient;
 	}
 
 //	public static WebClient newPhantomJsWebClient(String targetUrl, String outputDir, String username, String password) throws Exception {

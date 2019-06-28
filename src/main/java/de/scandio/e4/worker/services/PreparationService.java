@@ -71,7 +71,7 @@ public class PreparationService {
 //            	if (!setupScenarios.allRestOnly()) {
 //					webClient = new NoopWebClient();
 //				} else {
-					webClient = WorkerUtils.newChromeWebClientPreparePhase(
+					webClient = WorkerUtils.newChromeWebClient(
 							config.getTarget(), applicationStatusService.getInputDir(),
 							applicationStatusService.getOutputDir(), config.getUsername(), config.getPassword());
 //				}

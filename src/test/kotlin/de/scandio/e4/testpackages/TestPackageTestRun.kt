@@ -14,6 +14,7 @@ import de.scandio.e4.worker.util.WorkerUtils
 import org.openqa.selenium.Dimension
 import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getILoggerFactory
+import java.lang.Exception
 
 
 abstract class TestPackageTestRun {
@@ -68,21 +69,23 @@ abstract class TestPackageTestRun {
     protected fun executeAction(action: Action) {
         var webClient: WebClient = NoopWebClient()
         if (!action.isRestOnly()) {
-            webClient = WorkerUtils.newChromeWebClientPreparePhase(
+            webClient = WorkerUtils.newChromeWebClient(
                     getBaseUrl(), getInDir(), getOutDir(), getUsername(), getPassword()) as WebConfluence
             webClient.webDriver.manage().window().size = Dimension(2000, 1500)
         }
-
         val restConfluence = RestConfluence(getBaseUrl(), getUsername(), getPassword())
         log.info("Executing action ${action.javaClass.simpleName}")
-        action.execute(webClient, restConfluence)
         val runtimeName = "afteraction-${action.javaClass.simpleName}"
-        if (!action.isRestOnly()) {
-            webClient.takeScreenshot(runtimeName)
-            webClient.dumpHtml(runtimeName)
-            webClient.quit()
+        try {
+            action.execute(webClient, restConfluence)
+            log.info("Time taken: ${action.timeTaken}")
+        } finally {
+            if (!action.isRestOnly()) {
+                webClient.takeScreenshot(runtimeName)
+                webClient.dumpHtml(runtimeName)
+                webClient.quit()
+            }
         }
-        log.info("Time taken: ${action.timeTaken}")
     }
 
     protected fun executeActions(actions: ActionCollection): Measurement {
@@ -94,7 +97,7 @@ abstract class TestPackageTestRun {
             if (actions.allRestOnly()) {
                 webConfluence = NoopWebClient()
             } else {
-                webConfluence = WorkerUtils.newChromeWebClientPreparePhase(
+                webConfluence = WorkerUtils.newChromeWebClient(
                         getBaseUrl(), getInDir(), getOutDir(), getUsername(), getPassword()) as WebConfluence
             }
             val restConfluence = RestConfluence(getBaseUrl(), getUsername(), getPassword())

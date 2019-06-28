@@ -1,9 +1,8 @@
 package de.scandio.e4.testpackages.livelytheme
 
+import de.scandio.e4.testpackages.livelytheme.actions.ClearThemeSettingsAction
 import de.scandio.e4.testpackages.livelytheme.actions.SetupLivelyThemeMacroPages
-import de.scandio.e4.testpackages.livelytheme.virtualusers.LivelyThemeAdmin
-import de.scandio.e4.testpackages.livelytheme.virtualusers.MacroPageCreator
-import de.scandio.e4.testpackages.livelytheme.virtualusers.MacroPageReader
+import de.scandio.e4.testpackages.livelytheme.virtualusers.*
 import de.scandio.e4.testpackages.vanilla.actions.CreatePageAction
 import de.scandio.e4.testpackages.vanilla.actions.CreateSpaceAction
 import de.scandio.e4.testpackages.vanilla.actions.InstallPluginAction
@@ -32,16 +31,17 @@ import de.scandio.e4.worker.interfaces.TestPackage
  */
 class LivelyThemeTestPackage: TestPackage {
 
-    override fun getSetupActions(): ActionCollection {
+    fun getSystemSetupActions(): ActionCollection {
         val actions = ActionCollection()
         actions.add(InstallPluginAction("lively-theme", "3.1.1", LICENSE, PLUGIN_KEY))
         actions.add(SetThemeAction("lively-theme"))
+        actions.add(ClearThemeSettingsAction())
+        return actions
+    }
+
+    override fun getSetupActions(): ActionCollection {
+        val actions = ActionCollection()
         actions.add(CreateSpaceAction("LT", "Lively Theme", true))
-        actions.add(CreatePageAction("LT", "dashboard", DASHBOARD_CONTENT, true))
-        actions.add(CreatePageAction("LT", "header", "<p>header page</p>", true))
-        actions.add(CreatePageAction("LT", "footer", "<p>footer page</p>", true))
-        actions.add(CreatePageAction("LT", "menu", "<p>menu page</p>", true))
-        actions.add(CreatePageAction("LT", "submenu", "<p>submenu page</p>", true))
         actions.add(CreatePageAction("LT", "macros", "<p>macro pages</p>", true))
         actions.add(SetupLivelyThemeMacroPages("LT", "macros", 100, MACRO_PAGES))
         return actions
@@ -49,16 +49,20 @@ class LivelyThemeTestPackage: TestPackage {
 
     override fun getVirtualUsers(): VirtualUserCollection {
         val virtualUsers = VirtualUserCollection()
-        virtualUsers.add(Commentor::class.java, 0.04)
-        virtualUsers.add(Reader::class.java, 0.18)
-        virtualUsers.add(Creator::class.java, 0.04)
+        // 0.66
+        virtualUsers.add(Commentor::class.java, 0.08)
+        virtualUsers.add(Reader::class.java, 0.26)
+        virtualUsers.add(Creator::class.java, 0.08)
         virtualUsers.add(Searcher::class.java, 0.08)
         virtualUsers.add(Editor::class.java, 0.08)
         virtualUsers.add(Dashboarder::class.java, 0.08)
 
-        virtualUsers.add(MacroPageReader::class.java, 0.4)
-        virtualUsers.add(MacroPageCreator::class.java, 0.08)
+        // 0.34
+        virtualUsers.add(LivelyMacroPageReader::class.java, 0.2)
+        virtualUsers.add(LivelyMacroPageCreator::class.java, 0.04)
         virtualUsers.add(LivelyThemeAdmin::class.java, 0.02)
+        virtualUsers.add(LivelySpaceToggler::class.java, 0.04)
+        virtualUsers.add(LivelyPageToggler::class.java, 0.04)
         return virtualUsers
     }
 

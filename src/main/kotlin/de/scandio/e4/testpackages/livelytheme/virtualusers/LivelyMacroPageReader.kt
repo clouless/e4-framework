@@ -9,9 +9,9 @@ import de.scandio.e4.worker.interfaces.WebClient
 
 
 /**
- * === MacroPageReader ===
+ * === LivelyMacroPageReader ===
  *
- * LivelyTheme MacroPageReader VirtualUser.
+ * LivelyTheme LivelyMacroPageReader VirtualUser.
  *
  * Assumptions:
  * - Lively Theme app installed
@@ -28,7 +28,7 @@ import de.scandio.e4.worker.interfaces.WebClient
  *
  * @author Felix Grund
  */
-open class MacroPageReader : VirtualUser() {
+open class LivelyMacroPageReader : VirtualUser() {
 
     override fun getActions(): ActionCollection {
         val actions = ActionCollection()

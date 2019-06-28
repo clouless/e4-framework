@@ -57,7 +57,7 @@ public class E4Client {
 		for (Class<? extends VirtualUser> virtualUserClass : vusers) {
 			double weight = vusers.getWeight(virtualUserClass);
 			String formula = "Weight("+weight+") % 0.02 == 0";
-			boolean legalWeight = (weight * 100) % (int)(0.02*100) == 0;
+			boolean legalWeight = (int)(weight * 100) % (int)(0.02*100) == 0;
 			if (!legalWeight) {
 				throw new Exception("Illegal weight {"+weight+"}. Current formula: " + formula);
 			}

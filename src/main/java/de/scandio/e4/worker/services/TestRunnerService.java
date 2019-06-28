@@ -95,10 +95,7 @@ public class TestRunnerService {
 		for (Thread virtualUserThread : virtualUserThreads) {
 			virtualUserThread.join();
 		}
-		log.info("All tests are finished! Your database is at {{}}. It has a table {{}} with the results and a table {{}} with errors",
-				storageService.getDatabaseFilePath(),
-				StorageService.TABLE_NAME_MEASUREMENT,
-				StorageService.TABLE_NAME_ERROR);
+		log.info("All tests are finished! Your database is at {{}}", storageService.getDatabaseFilePath());
 
 		applicationStatusService.setTestsStatus(TestsStatus.FINISHED);
 	}

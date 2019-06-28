@@ -6,9 +6,9 @@ import de.scandio.e4.worker.interfaces.VirtualUser
 
 
 /**
- * === MacroPageCreator ===
+ * === LivelyMacroPageCreator ===
  *
- * LivelyTheme MacroPageCreator VirtualUser.
+ * LivelyTheme LivelyMacroPageCreator VirtualUser.
  *
  * Assumptions:
  * - Lively Theme app installed
@@ -23,7 +23,7 @@ import de.scandio.e4.worker.interfaces.VirtualUser
  *
  * @author Felix Grund
  */
-open class MacroPageCreator : VirtualUser() {
+open class LivelyMacroPageCreator : VirtualUser() {
 
     override fun getActions(): ActionCollection {
         val actions = ActionCollection()

@@ -39,4 +39,8 @@ open class LivelyThemeAdmin : VirtualUser() {
         return actions
     }
 
+    override fun isAdminRequired(): Boolean {
+        return true
+    }
+
 }
