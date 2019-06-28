@@ -67,14 +67,14 @@ public class PreparationService {
             }
             userCredentialsService.storeUsers(userCredentials);
             if (!setupScenarios.isEmpty()) {
-            	WebClient webClient;
-            	if (!setupScenarios.allRestOnly()) {
-					webClient = new NoopWebClient();
-				} else {
+				WebClient webClient;
+//            	if (!setupScenarios.allRestOnly()) {
+//					webClient = new NoopWebClient();
+//				} else {
 					webClient = WorkerUtils.newChromeWebClientPreparePhase(
 							config.getTarget(), applicationStatusService.getInputDir(),
 							applicationStatusService.getOutputDir(), config.getUsername(), config.getPassword());
-				}
+//				}
 				try {
 					for (Action action : setupScenarios) {
 						try {

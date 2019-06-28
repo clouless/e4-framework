@@ -26,11 +26,10 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
     @Test
     fun test() {
         try {
-            setupDatabase()
-            dom.awaitMinutes(4)
-            pollTillDbReady()
-            webConfluence.takeScreenshot("db-ready")
-            postDbSetup()
+//            setupDatabase()
+//            pollTillDbReady()
+//            webConfluence.takeScreenshot("db-ready")
+//            postDbSetup()
             refreshWebClient(true, true)
 
             /* Step 9: Admin config */
@@ -48,7 +47,6 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
             refreshWebClient(true, true)
             webConfluence.installPlugin("data-generator", "LATEST")
 
-            refreshWebClient(true, true)
         } catch (e: Exception) {
             shot()
             dump()
@@ -119,10 +117,10 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
 
         dom.click(".setup-success-button .aui-button-primary.finishAction")
 
-        dom.insertText("#grow-intro-space-name", "TEST")
-        dom.click("#grow-intro-create-space")
-        dom.awaitSeconds(10)
-        webConfluence.navigateTo("logout.action")
+//        dom.insertText("#grow-intro-space-name", "TEST")
+//        dom.click("#grow-intro-create-space")
+//        dom.awaitSeconds(10)
+//        webConfluence.navigateTo("logout.action")
 
         shot()
     }
