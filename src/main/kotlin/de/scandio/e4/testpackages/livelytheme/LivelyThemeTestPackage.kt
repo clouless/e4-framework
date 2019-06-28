@@ -1,6 +1,11 @@
 package de.scandio.e4.testpackages.livelytheme
 
 import de.scandio.e4.testpackages.livelytheme.actions.SetRandomCustomElement
+import de.scandio.e4.testpackages.livelytheme.actions.SetupLivelyThemeMacroPages
+import de.scandio.e4.testpackages.vanilla.actions.CreatePageAction
+import de.scandio.e4.testpackages.vanilla.actions.CreateSpaceAction
+import de.scandio.e4.testpackages.vanilla.actions.InstallPluginAction
+import de.scandio.e4.testpackages.vanilla.actions.SetThemeAction
 import de.scandio.e4.testpackages.vanilla.virtualusers.*
 import de.scandio.e4.worker.collections.ActionCollection
 import de.scandio.e4.worker.interfaces.TestPackage
@@ -27,22 +32,16 @@ class LivelyThemeTestPackage: TestPackage {
 
     override fun getSetupActions(): ActionCollection {
         val actions = ActionCollection()
-//        actions.add(InstallPluginAction("lively-theme", "3.1.1", LICENSE, PLUGIN_KEY))
-//        actions.add(SetThemeAction("lively-theme"))
-        actions.add(SetRandomCustomElement("LT", "Lively Theme Home"))
-//
-//        actions.add(CreateSpaceAction("LT", "Lively Theme", true))
-//        actions.add(CreatePageAction("LT", "dashboard", DASHBOARD_CONTENT, true))
-//        actions.add(CreatePageAction("LT", "header", "<p>header page</p>", true))
-//        actions.add(CreatePageAction("LT", "footer", "<p>footer page</p>", true))
-//        actions.add(CreatePageAction("LT", "menu", "<p>menu page</p>", true))
-//        actions.add(CreatePageAction("LT", "submenu", "<p>submenu page</p>", true))
-//        actions.add(CreatePageAction("LT", "macros", "<p>macro pages</p>", true))
-//
-//        actions.add(SetupLivelyThemeMacroPages("LT", "macros", 100, MACRO_PAGES))
-
-
-//        actions.add(CreateLivelyThemeMacroPage("LT", MACRO_IDS_AND_NAMES))
+        actions.add(InstallPluginAction("lively-theme", "3.1.1", LICENSE, PLUGIN_KEY))
+        actions.add(SetThemeAction("lively-theme"))
+        actions.add(CreateSpaceAction("LT", "Lively Theme", true))
+        actions.add(CreatePageAction("LT", "dashboard", DASHBOARD_CONTENT, true))
+        actions.add(CreatePageAction("LT", "header", "<p>header page</p>", true))
+        actions.add(CreatePageAction("LT", "footer", "<p>footer page</p>", true))
+        actions.add(CreatePageAction("LT", "menu", "<p>menu page</p>", true))
+        actions.add(CreatePageAction("LT", "submenu", "<p>submenu page</p>", true))
+        actions.add(CreatePageAction("LT", "macros", "<p>macro pages</p>", true))
+        actions.add(SetupLivelyThemeMacroPages("LT", "macros", 100, MACRO_PAGES))
         return actions
     }
 
@@ -60,15 +59,6 @@ class LivelyThemeTestPackage: TestPackage {
     val LICENSE = System.getenv("E4_LICENSE_LIVELY_THEME")
 
     val PLUGIN_KEY = "de.scandio.confluence.plugins.lively-theme"
-
-    val MACRO_IDS_AND_NAMES = mapOf(
-            "lively-button" to "Button",
-            "lively-column-width" to "Column Width",
-            "lively-widget" to "Widget",
-            "lively-menu" to "Menu",
-            "lively-list" to "List",
-            "lively-margin" to "Margin"
-    )
 
     val MACRO_PAGES = mapOf(
             "lively-button" to "<ac:structured-macro ac:name=\"lively-button\" ac:schema-version=\"1\"><ac:parameter ac:name=\"link\"><ac:link><ri:page ri:content-title=\"Lively Theme Home\" /></ac:link></ac:parameter><ac:parameter ac:name=\"text\">My Button</ac:parameter></ac:structured-macro>",

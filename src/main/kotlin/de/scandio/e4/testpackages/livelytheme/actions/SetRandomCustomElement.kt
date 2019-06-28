@@ -5,15 +5,13 @@ import de.scandio.e4.worker.interfaces.Action
 import de.scandio.e4.worker.interfaces.RestClient
 import de.scandio.e4.worker.interfaces.WebClient
 import de.scandio.e4.worker.util.WorkerUtils
-import org.openqa.selenium.Dimension
 import java.util.*
 
 /**
  * @author Felix Grund
  */
 open class SetRandomCustomElement(
-        val spaceKeyForThemePages: String,
-        val startPageTitle: String
+        val spaceKey: String
 ) : Action() {
 
     protected var start: Long = 0
@@ -46,7 +44,7 @@ open class SetRandomCustomElement(
         if ("dashboard".equals(randomCustomElement)) {
             webConfluence.goToDashboard()
         } else {
-            webConfluence.goToPage(spaceKeyForThemePages, startPageTitle)
+            webConfluence.goToSpaceHomePage(spaceKey)
         }
 
         // in this case we need to open the dropdown first
@@ -80,11 +78,10 @@ open class SetRandomCustomElement(
         val customElementPageTitle = "$customElementKey (${Date().time})"
         dom.click(".lively-custom-$customElementKey .lively-custom-element-edit-button")
         dom.awaitElementVisible("input#pageTitle")
-        dom.insertText("#spaceKey", spaceKeyForThemePages, true)
+        dom.insertText("#spaceKey", spaceKey, true)
         dom.insertText("#pageTitle", customElementPageTitle, true)
         dom.click("#create-$customElementKey-page-dialog button.submit")
         webConfluence.awaitEditPageLoaded()
-        webConfluence.takeScreenshot("TEST")
         if (setContentAndSave) {
             dom.insertTextTinyMce("<p>Auto generated $customElementKey page</p>")
             webConfluence.savePage()

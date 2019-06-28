@@ -21,7 +21,7 @@ import de.scandio.e4.worker.interfaces.VirtualUser
  *
  * @author Felix Grund
  */
-open class BranchCreator : VirtualUser {
+open class BranchCreator : VirtualUser() {
 
     protected var virtualUserStartTime: Long = 0
 

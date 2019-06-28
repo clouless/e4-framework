@@ -25,7 +25,7 @@ import java.util.*
  *
  * @author Felix Grund
  */
-class BranchOverviewCreator : VirtualUser {
+class BranchOverviewCreator : VirtualUser() {
 
     override fun getActions(): ActionCollection {
         val actions = ActionCollection()

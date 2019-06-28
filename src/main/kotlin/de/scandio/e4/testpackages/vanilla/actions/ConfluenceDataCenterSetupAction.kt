@@ -24,8 +24,7 @@ class ConfluenceDataCenterSetupAction : Action() {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    private val E4_LICENSE_CONF = "AAABLw0ODAoPeNp9kF9PgzAUxd/7KZr4og8sg8mYS0g0QJQEmJHpky933WU2YWXpn2V8ewt1mZroW3tue37nnquyE7SEngYR9RfLMFqGM5qkaxpM/TuSdEID0xXsMW6w5afJThqxvVcMxJZ3ky0S1olmYt/wI8ZaGiTPRrIPUJiCxnhw8aahFyxIwRkKhdnpwGX/bTj3gugMykrg7b8k+xESFBqlo9Vmo5jkB8074RRrYccCBPuDNfpUZr9BuWpeFUoVe75Taw1ysG6gVXhOnKdxkad1VnmFP5tHt5G/IPYW/1RWcgeCKxiD1C41fdxvnkgicVR/FzISvxjr/oBjy8mqLLOXJH8oSOtGbzbg4BmQFC+r2sKa1qBdkl4PnVBXys37kmZHaM1IJJej6+YTcDek9jAsAhQMjndzQwNXokcsfeEbtiQJn5ZfSwIUaMVmEklmaIX9V0zou8i5649ihAg=X02f7"
-            //System.getenv("E4_LICENSE_CONF")
+    private val E4_LICENSE_CONF = System.getenv("E4_LICENSE_CONF")
 
     override fun execute(webClient: WebClient, restClient: RestClient) {
         try {
@@ -64,8 +63,8 @@ class ConfluenceDataCenterSetupAction : Action() {
         webConfluence.disablePlugin("com.atlassian.troubleshooting.plugin-confluence")
         refreshWebClient(true, true)
         webConfluence.disablePlugin("com.atlassian.plugins.base-hipchat-integration-plugin")
-        refreshWebClient(true, true)
-        webConfluence.installPlugin("data-generator", "LATEST")
+//        refreshWebClient(true, true)
+//        webConfluence.installPlugin("data-generator", "LATEST")
         this.end = Date().time
     }
 
@@ -75,19 +74,19 @@ class ConfluenceDataCenterSetupAction : Action() {
         webConfluence.navigateToBaseUrl()
         dom.awaitSeconds(3) // just wait a bit for safety
 
-//        /* Step 1: Test vs. Production */
-//        dom.awaitElementPresent("[name='startform']")
-//        dom.click("#custom .plugin-disabled-icon")
-//        dom.click("#setup-next-button")
-//
-//        /* Step 2: Apps */
-//        dom.awaitElementPresent("[bundle-id='com.atlassian.confluence.plugins.confluence-questions']")
-//        dom.click("#setup-next-button")
-//
-//        /* Step 3: License */
-//        dom.click("#confLicenseString")
-//        dom.insertText("#confLicenseString", E4_LICENSE_CONF)
-//        dom.click("#setupTypeCustom")
+        /* Step 1: Test vs. Production */
+        dom.awaitElementPresent("[name='startform']")
+        dom.click("#custom .plugin-disabled-icon")
+        dom.click("#setup-next-button")
+
+        /* Step 2: Apps */
+        dom.awaitElementPresent("[bundle-id='com.atlassian.confluence.plugins.confluence-questions']")
+        dom.click("#setup-next-button")
+
+        /* Step 3: License */
+        dom.click("#confLicenseString")
+        dom.insertText("#confLicenseString", E4_LICENSE_CONF)
+        dom.click("#setupTypeCustom")
 
         /* Step 4: Cluster configuration */
         dom.insertText("#clusterName", "confluence-cluster")

@@ -13,10 +13,9 @@ import java.util.*
 /**
  * @author Felix Grund
  */
-open class CreateLivelyThemeMacroPage (
-        val spaceKey: String,
-        val macros: Map<String, String>
-    ) : Action() {
+open class CreateRandomLivelyThemeMacroPage (
+        val spaceKey: String
+) : Action() {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -25,13 +24,22 @@ open class CreateLivelyThemeMacroPage (
 
     var webConfluence: WebConfluence? = null
 
+    val MACRO_IDS_AND_NAMES = mapOf(
+            "lively-button" to "Button",
+            "lively-column-width" to "Column Width",
+            "lively-widget" to "Widget",
+            "lively-menu" to "Menu",
+            "lively-list" to "List",
+            "lively-margin" to "Margin"
+    )
+
     override fun execute(webClient: WebClient, restClient: RestClient) {
         val webConfluence = webClient as WebConfluence
         this.webConfluence = webConfluence
         val dom = webConfluence.dom
-        val numMacros = macros.keys.size
+        val numMacros = MACRO_IDS_AND_NAMES.keys.size
         val randIndex = Random().nextInt(numMacros)
-        val macroId = "lively-column-width"//macros.keys.toTypedArray()[randIndex]
+        val macroId = MACRO_IDS_AND_NAMES.keys.toTypedArray()[randIndex]
         val pageTitle = "Macro Page $macroId (${Date().time})"
         webConfluence.login()
         this.start = Date().time
@@ -76,7 +84,7 @@ open class CreateLivelyThemeMacroPage (
     }
 
     fun insertLivelyMacro(macroId: String, macroParameters: Map<String, String> = emptyMap()) {
-        webConfluence!!.insertMacro(macroId, macros[macroId]!!, macroParameters)
+        webConfluence!!.insertMacro(macroId, MACRO_IDS_AND_NAMES[macroId]!!, macroParameters)
     }
 
     override fun getTimeTaken(): Long {

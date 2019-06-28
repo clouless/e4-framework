@@ -118,9 +118,16 @@ public class TestRunnerService {
 
 		final Thread virtualUserThread = new Thread(() -> {
 			try {
-				final UserCredentials randomUser = userCredentialsService.getRandomUser();
-				final String username = randomUser.getUsername();
-				final String password = randomUser.getPassword();
+				String username;
+				String password;
+				if (virtualUser.isAdminRequired()) {
+					username = config.getUsername();
+					password = config.getPassword();
+				} else {
+					final UserCredentials randomUser = userCredentialsService.getRandomUser();
+					username = randomUser.getUsername();
+					password = randomUser.getPassword();
+				}
 
 				log.info("Executing virtual user {{}} with actual user {{}}", virtualUser.getClass().getSimpleName(), username);
 
@@ -170,7 +177,7 @@ public class TestRunnerService {
 			String actionClass = action.getClass().getSimpleName();
 			String testpackageClass = testPackage.getClass().getSimpleName();
 			WebClient webClient = null;
-			RestClient restClient = null;
+			RestClient restClient;
 			try {
 				long workerTimeRunning = new Date().getTime() - threadStartTime;
 				if (workerTimeRunning > durationInSeconds * 1000) {

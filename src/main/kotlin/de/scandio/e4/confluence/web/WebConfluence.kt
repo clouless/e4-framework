@@ -161,6 +161,11 @@ class WebConfluence(
         dom.awaitElementPresent("#main-content")
     }
 
+    fun goToSpaceHomePage(spaceKey: String) {
+        navigateTo("display/$spaceKey")
+        dom.awaitElementPresent("#main-content")
+    }
+
     fun goToEditPage() {
         dom.awaitElementClickable("#editPageLink")
         dom.click("#editPageLink")
