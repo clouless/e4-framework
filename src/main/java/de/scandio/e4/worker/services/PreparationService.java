@@ -82,8 +82,10 @@ public class PreparationService {
 							action.execute(webClient, restConfluence);
 						} catch (Exception e) {
 							log.error("Failed executing action {{}}", action.getClass().getSimpleName());
-							webClient.takeScreenshot("failed-action");
-							webClient.dumpHtml("failed-action");
+							if (!action.isRestOnly()) {
+								webClient.takeScreenshot("failed-action");
+								webClient.dumpHtml("failed-action");
+							}
 							throw e;
 						}
 

@@ -45,8 +45,8 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
             webConfluence.disablePlugin("com.atlassian.troubleshooting.plugin-confluence")
             refreshWebClient(true, true)
             webConfluence.disablePlugin("com.atlassian.plugins.base-hipchat-integration-plugin")
-//            refreshWebClient(true, true)
-//            webConfluence.installPlugin("data-generator", "LATEST")
+            refreshWebClient(true, true)
+            webConfluence.installPlugin("data-generator", "LATEST")
 
             refreshWebClient(true, true)
         } catch (e: Exception) {

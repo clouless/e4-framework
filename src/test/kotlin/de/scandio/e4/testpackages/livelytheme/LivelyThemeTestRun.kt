@@ -16,11 +16,7 @@ class LivelyThemeTestRun : TestPackageTestRun() {
     private val USERNAME = "admin"
     private val PASSWORD = "admin"
     private val TEST_PACKAGE = LivelyThemeTestPackage()
-    private val PREPARATION_RUN = true
-
-    val DASHBOARD_CONTENT = """
-        <p><ac:structured-macro ac:name="recently-updated" ac:schema-version="1" ac:macro-id="c148d3ff-5eb4-4e63-b7d1-4b27ae7b3689"><ac:parameter ac:name="max">40</ac:parameter><ac:parameter ac:name="hideHeading">true</ac:parameter><ac:parameter ac:name="theme">social</ac:parameter></ac:structured-macro></p>
-    """.trimIndent()
+    private val PREPARATION_RUN = false
 
     @Before
     fun before() {
@@ -32,7 +28,7 @@ class LivelyThemeTestRun : TestPackageTestRun() {
         if (PREPARATION_RUN) {
             executeTestPackagePrepare(TEST_PACKAGE)
         } else {
-//            executeTestPackage(TEST_PACKAGE)
+            executeTestPackage(TEST_PACKAGE)
 
             // Run a single action for testing:
 

@@ -1,15 +1,17 @@
 package de.scandio.e4.testpackages.livelytheme
 
-import de.scandio.e4.testpackages.livelytheme.actions.SetRandomCustomElement
 import de.scandio.e4.testpackages.livelytheme.actions.SetupLivelyThemeMacroPages
+import de.scandio.e4.testpackages.livelytheme.virtualusers.LivelyThemeAdmin
+import de.scandio.e4.testpackages.livelytheme.virtualusers.MacroPageCreator
+import de.scandio.e4.testpackages.livelytheme.virtualusers.MacroPageReader
 import de.scandio.e4.testpackages.vanilla.actions.CreatePageAction
 import de.scandio.e4.testpackages.vanilla.actions.CreateSpaceAction
 import de.scandio.e4.testpackages.vanilla.actions.InstallPluginAction
 import de.scandio.e4.testpackages.vanilla.actions.SetThemeAction
 import de.scandio.e4.testpackages.vanilla.virtualusers.*
 import de.scandio.e4.worker.collections.ActionCollection
-import de.scandio.e4.worker.interfaces.TestPackage
 import de.scandio.e4.worker.collections.VirtualUserCollection
+import de.scandio.e4.worker.interfaces.TestPackage
 
 /**
  * === LivelyThemeTestPackage ===
@@ -47,12 +49,16 @@ class LivelyThemeTestPackage: TestPackage {
 
     override fun getVirtualUsers(): VirtualUserCollection {
         val virtualUsers = VirtualUserCollection()
-        virtualUsers.add(Commentor::class.java, 0.08)
-        virtualUsers.add(Reader::class.java, 0.36)
-        virtualUsers.add(Creator::class.java, 0.08)
-        virtualUsers.add(Searcher::class.java, 0.16)
-        virtualUsers.add(Editor::class.java, 0.16)
-        virtualUsers.add(Dashboarder::class.java, 0.16)
+        virtualUsers.add(Commentor::class.java, 0.04)
+        virtualUsers.add(Reader::class.java, 0.18)
+        virtualUsers.add(Creator::class.java, 0.04)
+        virtualUsers.add(Searcher::class.java, 0.08)
+        virtualUsers.add(Editor::class.java, 0.08)
+        virtualUsers.add(Dashboarder::class.java, 0.08)
+
+        virtualUsers.add(MacroPageReader::class.java, 0.4)
+        virtualUsers.add(MacroPageCreator::class.java, 0.08)
+        virtualUsers.add(LivelyThemeAdmin::class.java, 0.02)
         return virtualUsers
     }
 

@@ -66,16 +66,22 @@ abstract class TestPackageTestRun {
     }
 
     protected fun executeAction(action: Action) {
-        val webConfluence = WorkerUtils.newChromeWebClientPreparePhase(
-                getBaseUrl(), getInDir(), getOutDir(), getUsername(), getPassword()) as WebConfluence
-        webConfluence.webDriver.manage().window().size = Dimension(2000, 1500)
+        var webClient: WebClient = NoopWebClient()
+        if (!action.isRestOnly()) {
+            webClient = WorkerUtils.newChromeWebClientPreparePhase(
+                    getBaseUrl(), getInDir(), getOutDir(), getUsername(), getPassword()) as WebConfluence
+            webClient.webDriver.manage().window().size = Dimension(2000, 1500)
+        }
+
         val restConfluence = RestConfluence(getBaseUrl(), getUsername(), getPassword())
         log.info("Executing action ${action.javaClass.simpleName}")
-        action.execute(webConfluence, restConfluence)
+        action.execute(webClient, restConfluence)
         val runtimeName = "afteraction-${action.javaClass.simpleName}"
-        webConfluence.takeScreenshot(runtimeName)
-        webConfluence.dumpHtml(runtimeName)
-        webConfluence.quit()
+        if (!action.isRestOnly()) {
+            webClient.takeScreenshot(runtimeName)
+            webClient.dumpHtml(runtimeName)
+            webClient.quit()
+        }
         log.info("Time taken: ${action.timeTaken}")
     }
 
