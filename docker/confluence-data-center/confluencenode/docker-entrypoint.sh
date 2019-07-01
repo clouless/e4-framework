@@ -80,6 +80,11 @@ else
   # NODE 1
   #
   echo ">> docker-entrypoint: starting confluence home sync server on port 8888"
+  #BEGIN: edit
+  echo ">> docker-entrypoint: copying home dir from template"
+  cp -r /confluence-home-smallds/* /confluence-home/
+  cp -r /confluence-shared-home-smallds/* /confluence-shared-home/
+  #END: edit
   python /work-private/confluence-home-sync-server.py &
 fi
 
