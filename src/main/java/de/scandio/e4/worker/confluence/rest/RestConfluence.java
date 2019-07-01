@@ -175,9 +175,9 @@ public class RestConfluence implements RestClient {
 	private String sendPostOrPutRequest(HttpMethod method, String urlAfterBaseUrl, String body) {
 		final String url = this.baseUrl + urlAfterBaseUrl;
 		RestTemplate restTemplate = new RestTemplate(new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()));
-		List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
-		interceptors.add(new LoggingRequestInterceptor());
-		restTemplate.setInterceptors(interceptors);
+//		List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
+//		interceptors.add(new LoggingRequestInterceptor());
+//		restTemplate.setInterceptors(interceptors);
 
 		log.debug("Sending {{}} request {{}} with body {{}}", method, url, body);
 

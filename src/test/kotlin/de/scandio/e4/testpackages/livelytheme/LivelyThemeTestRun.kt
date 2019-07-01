@@ -1,6 +1,8 @@
 package de.scandio.e4.testpackages.livelytheme
 
 import de.scandio.e4.testpackages.TestPackageTestRun
+import de.scandio.e4.testpackages.vanilla.actions.CreatePageAction
+import de.scandio.e4.testpackages.vanilla.actions.CreateSpaceAction
 import de.scandio.e4.testpackages.vanilla.actions.FavPageToggleAction
 import de.scandio.e4.worker.interfaces.TestPackage
 import org.junit.Before
@@ -30,7 +32,7 @@ class LivelyThemeTestRun : TestPackageTestRun() {
 //            executeTestPackage(TEST_PACKAGE)
 
             // Run a single action for testing:
-            executeAction(FavPageToggleAction())
+            executeAction(CreatePageAction("LT", "macros", "<p>macro pages</p>", false))
 
             // Run single virtual user for testing:
             // executeActions(BranchCreator().actions)

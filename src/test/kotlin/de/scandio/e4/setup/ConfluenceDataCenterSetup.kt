@@ -17,7 +17,7 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
     private fun runTestPackageSystemSetup() {
         val testPackage = LivelyThemeTestPackage()
         for (action in testPackage.getSystemSetupActions()) {
-            refreshWebClient(true, true)
+            refreshWebClient(true)
             action.execute(webConfluence, restConfluence)
         }
     }
@@ -42,17 +42,19 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
 
             /* Step 9: Admin config */
             refreshWebClient(true, true)
-            webConfluence.disableMarketplaceConnectivity()
-            refreshWebClient(true, true)
             webConfluence.disableSecureAdminSessions()
-            refreshWebClient(true, true)
+            refreshWebClient(true)
+            webConfluence.disableMarketplaceConnectivity()
+            refreshWebClient(true)
             webConfluence.disableCaptchas()
-            refreshWebClient(true, true)
+            refreshWebClient(true)
             webConfluence.setLogLevel("co.goodsoftware", "INFO")
-            refreshWebClient(true, true)
+            refreshWebClient(true)
             webConfluence.disablePlugin("com.atlassian.troubleshooting.plugin-confluence")
-            refreshWebClient(true, true)
+            refreshWebClient(true)
             webConfluence.disablePlugin("com.atlassian.plugins.base-hipchat-integration-plugin")
+            refreshWebClient(true)
+            webConfluence.disablePlugin("com.atlassian.confluence.plugins.confluence-onboarding")
             refreshWebClient(true, true)
             webConfluence.installPlugin("data-generator", "LATEST")
 
@@ -104,8 +106,6 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
         dom.awaitElementVisible("#setupdb-successMessage") // not sure if this is working
         dom.click("#setup-next-button")
 
-        /* This takes a few minutes! Make sure the next step has a wait value! */
-        log.info("Database setup in progress. This takes a while. Grab some coffee... :)")
         shot()
     }
 
@@ -131,7 +131,7 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
 
         dom.insertText("#grow-intro-space-name", "TEST")
         dom.click("#grow-intro-create-space")
-        dom.awaitSeconds(10)
+        dom.awaitSeconds(20)
         webConfluence.navigateTo("logout.action")
 
         shot()

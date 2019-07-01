@@ -7,6 +7,7 @@ umask u+rxw,g+rwx,o-rwx
 #
 # FIND OUT IP ADDRESS
 #
+#IP_ADDRESS="127.0.0.1"
 IP_ADDRESS=$(/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
 
 #

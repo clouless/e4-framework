@@ -120,7 +120,7 @@ function start_instance_database {
         --net-alias=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-db \
         -e POSTGRES_PASSWORD=confluence \
         -e POSTGRES_USER=confluence \
-        -d postgres:${POSTGRESQL_VERSION}
+        -d fgrund/postgres:${POSTGRESQL_VERSION}
 }
 
 # Kill the database instance
@@ -142,7 +142,9 @@ function start_instance_confluencenode {
         --net-alias=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-node${1} \
         --env NODE_NUMBER=${1} \
         -v confluence-shared-home-${CONFLUENCE_VERSION_DOT_FREE}:/confluence-shared-home \
-        -d codeclou/docker-atlassian-confluence-data-center:confluencenode-${CONFLUENCE_VERSION}
+        -d fgrund/docker-atlassian-confluence-data-center:confluencenode-${CONFLUENCE_VERSION}
+        #--memory 4GB \
+        #--memory-reservation 3GB \
 }
 
 # Kill a confluencenode instance

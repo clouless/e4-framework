@@ -21,8 +21,17 @@ public class WorkerUtils {
 	public static WebDriver newChromeDriver() {
 		WebDriverManager.chromedriver().setup();
 		ChromeOptions chromeOptions = new ChromeOptions();
+//		chromeOptions.addArguments("start-maximized");
+		chromeOptions.addArguments("enable-automation");
 		chromeOptions.addArguments("--headless");
 		chromeOptions.addArguments("--disable-impl-side-painting");
+		chromeOptions.addArguments("--no-sandbox");
+		//AGRESSIVE: options.setPageLoadStrategy(PageLoadStrategy.NONE); // https://www.skptricks.com/2018/08/timed-out-receiving-message-from-renderer-selenium.html
+		chromeOptions.addArguments("--disable-infobars"); //https://stackoverflow.com/a/43840128/1689770
+		chromeOptions.addArguments("--disable-dev-shm-usage"); //https://stackoverflow.com/a/50725918/1689770
+		chromeOptions.addArguments("--disable-browser-side-navigation"); //https://stackoverflow.com/a/49123152/1689770
+		chromeOptions.addArguments("--disable-gpu"); //https://stackoverflow.com/questions/51959986/how-to-solve-selenium-chromedriver-timed-out-receiving-message-from-renderer-exc
+
 		return new ChromeDriver(chromeOptions);
 	}
 

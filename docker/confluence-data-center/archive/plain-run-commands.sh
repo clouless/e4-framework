@@ -14,7 +14,7 @@ docker run \
     --net-alias=confluence-cluster-6153-db \
     -e POSTGRES_PASSWORD=confluence \
     -e POSTGRES_USER=confluence \
-    -d fgrund/postgres:9.6
+    -it fgrund/postgres:9.6
 
 #
 # LOADBALANCER

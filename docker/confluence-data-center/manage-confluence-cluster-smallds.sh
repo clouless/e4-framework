@@ -120,7 +120,7 @@ function start_instance_database {
         --net-alias=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-db \
         -e POSTGRES_PASSWORD=confluence \
         -e POSTGRES_USER=confluence \
-        -d fgrund/postgres:${POSTGRESQL_VERSION}
+        -d fgrund/postgres:${POSTGRESQL_VERSION}-smalldataset
 }
 
 # Kill the database instance
@@ -142,7 +142,7 @@ function start_instance_confluencenode {
         --net-alias=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-node${1} \
         --env NODE_NUMBER=${1} \
         -v confluence-shared-home-${CONFLUENCE_VERSION_DOT_FREE}:/confluence-shared-home \
-        -d fgrund/docker-atlassian-confluence-data-center:confluencenode-${CONFLUENCE_VERSION}
+        -d fgrund/docker-atlassian-confluence-data-center:confluencenode-${CONFLUENCE_VERSION}-smalldataset
 }
 
 # Kill a confluencenode instance
@@ -165,16 +165,6 @@ function clean_confluencenode_shared_home {
     fi
     echo -e $C_CYN">> clean shared home ..:${C_RST}${C_GRN} Creating${C_RST}  - Creating volume ${volume_name}"
     docker volume create ${volume_name}
-}
-
-# Pulls the latest docker images from docker hub
-#
-#
-function pull_latest_images {
-    echo -e $C_CYN">> docker pull ........:${C_RST}${C_GRN} Pulling${C_RST}   - Pulling latest images from Docker Hub."
-    docker pull codeclou/docker-atlassian-confluence-data-center:confluencenode-${CONFLUENCE_VERSION}
-    docker pull codeclou/docker-atlassian-confluence-data-center:loadbalancer-${CONFLUENCE_VERSION}
-    docker pull postgres:${POSTGRESQL_VERSION}
 }
 
 # Creates a network for cluster
@@ -256,20 +246,6 @@ function remove_all_dangling_confluencenodes {
     done
 }
 
-
-# Update check
-#
-#
-function update_check {
-    local unique_hash=$(cat /dev/urandom | LC_CTYPE=C tr -dc "[:alpha:]" | head -c 16)
-    local latest_version=$(curl -s https://raw.githubusercontent.com/codeclou/docker-atlassian-confluence-data-center/master/6.15.3/manage-confluence-cluster-6.15.3-version.txt?r=${unique_hash})
-    if (( latest_version > MANAGEMENT_SCRIPT_VERSION )) # arithmetic brackets ... woohoo
-    then
-        echo -e $C_CYN">> management script ..:${C_RST}${C_RED} OUTOFDATE${C_RST} - please update the management script. Visit GitHub for instructions."
-    else
-        echo -e $C_CYN">> management script ..:${C_RST}${C_GRN} UPTODATE${C_RST}  - your script is up to date."
-    fi
-}
 
 # Prints info
 #
