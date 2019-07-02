@@ -54,7 +54,10 @@ sed -i 's/Xms1024/Xms4096/g' /confluence/atlassian-confluence-latest/bin/setenv.
 # PATCH server.xml FOR PROXY USE
 #
 sed -i -e "s/port=\"8090\"/port=\"8090\" proxyName=\"${LB_NAME}\" proxyPort=\"${LB_PORT}\" scheme=\"http\"/g" /confluence/atlassian-confluence-latest/conf/server.xml
-
+# BEGIN: edit
+sed -i 's/Xmx1024/Xmx4096/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
+sed -i 's/Xms1024/Xms4096/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
+# END: edit
 
 #
 # START SYNCHRONY

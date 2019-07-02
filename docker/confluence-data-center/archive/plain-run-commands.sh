@@ -8,13 +8,14 @@ create_network
 # DATABASE
 #
 docker run \
+    --sysctl kernel.shmmax=100663296 \
     --rm \
     --name confluence-cluster-6153-db \
     --net=confluence-cluster-6153 \
     --net-alias=confluence-cluster-6153-db \
     -e POSTGRES_PASSWORD=confluence \
     -e POSTGRES_USER=confluence \
-    -it fgrund/postgres:9.6
+    -d fgrund/postgres:9.6-smalldataset -c max_connections=300 -c shared_buffers=80MB
 
 #
 # LOADBALANCER

@@ -115,12 +115,13 @@ function start_instance_database {
     echo -e $C_CYN">> docker run .........:${C_RST}${C_GRN} Starting${C_RST}  - Starting instance confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-db."
     docker run \
         --rm \
+        --sysctl kernel.shmmax=100663296 \
         --name confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-db \
         --net=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE} \
         --net-alias=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-db \
         -e POSTGRES_PASSWORD=confluence \
         -e POSTGRES_USER=confluence \
-        -d fgrund/postgres:${POSTGRESQL_VERSION}-smalldataset
+        -d fgrund/postgres:${POSTGRESQL_VERSION}-smalldataset -c max_connections=300 -c shared_buffers=80MB
 }
 
 # Kill the database instance
