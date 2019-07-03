@@ -68,24 +68,24 @@ class WebConfluence(
         // Do the following if you want to do it only initially when the browser is opened
         // if (driver.currentUrl.equals("about:blank") || driver.currentUrl.equals("data:,")) { // only login once!
         navigateTo("login.action")
-        dom.awaitElementPresent("form[name='loginform'], .login-section p.last, #main-content", 20)
+        dom.awaitElementPresent("form[name='loginform'], .login-section p.last, #main-content", 40)
         if (dom.isElementPresent("form[name='loginform']")) {
             dom.insertText("#os_username", this.username)
             dom.insertText("#os_password", this.password)
             dom.click("#loginButton")
             try {
-                dom.awaitElementPresent(".pagebody", 20)
+                dom.awaitElementPresent(".pagebody", 40)
                 if (dom.isElementPresent("#dashboard-onboarding-dialog")) {
                     dom.click("#dashboard-onboarding-dialog .aui-button-primary")
                     dom.awaitMilliseconds(50)
                 }
             } catch (e: TimeoutException) {
-                dom.click("#grow-intro-video-skip-button", 20)
+                dom.click("#grow-intro-video-skip-button", 40)
                 dom.click("#grow-ic-content button[data-action='skip']")
                 dom.click(".intro-find-spaces-relevant-spaces text:first-child .intro-find-spaces-space")
                 dom.awaitMilliseconds(1000)
                 dom.click(".intro-find-spaces-button-continue")
-                dom.awaitElementPresent(".pagebody", 20)
+                dom.awaitElementPresent(".pagebody", 40)
             }
         } else {
             log.debug("Went to login screen but was already logged in")

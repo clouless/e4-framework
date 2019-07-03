@@ -8,6 +8,27 @@ import de.scandio.e4.worker.util.WorkerUtils
 import java.util.*
 
 /**
+ * === SetRandomCustomElement ===
+ *
+ * Lively Theme SetRandomCustomElement action.
+ *
+ * Assumptions:
+ * - Lively Theme app installed
+ * - Admin account required!
+ *
+ * Procedure (SELENIUM):
+ * - Navigate to the global Lively Theme settings page
+ * - Clear all custom elements
+ * - Select a custom element by random
+ * - Depending on the custom element selected:
+ * -- go to page associated with custom element
+ * -- click edit button
+ * -- add page content that makes sense for custom element
+ * -- save page
+ *
+ * Result:
+ * - Random Lively Theme custom element is selected and associated page created
+ *
  * @author Felix Grund
  */
 open class SetRandomCustomElement(

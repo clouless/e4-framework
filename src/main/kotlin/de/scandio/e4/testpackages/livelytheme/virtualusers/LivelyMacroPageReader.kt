@@ -1,11 +1,8 @@
 package de.scandio.e4.testpackages.livelytheme.virtualusers
 
-import de.scandio.e4.testpackages.vanilla.actions.ViewPageAction
 import de.scandio.e4.testpackages.vanilla.actions.ViewRandomContent
 import de.scandio.e4.worker.collections.ActionCollection
-import de.scandio.e4.worker.interfaces.RestClient
 import de.scandio.e4.worker.interfaces.VirtualUser
-import de.scandio.e4.worker.interfaces.WebClient
 
 
 /**
@@ -24,7 +21,7 @@ import de.scandio.e4.worker.interfaces.WebClient
  * - NONE
  *
  * Actions:
- * - View random child page of "macros" page in space "LT"
+ * - View random page containing Lively Theme macro and associated page content
  *
  * @author Felix Grund
  */

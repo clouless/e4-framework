@@ -205,7 +205,7 @@ public class TestRunnerService {
 						virtualUser.getClass().getSimpleName(),
 						action.getClass().getSimpleName());
 				storageService.recordError(e4error);
-				webClient.takeScreenshot("failed-scenario");
+//				webClient.takeScreenshot("failed-scenario");
 			} finally {
 				if (webClient != null) {
 					webClient.quit();

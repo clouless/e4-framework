@@ -11,6 +11,23 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 /**
+ * === CreateRandomLivelyThemeMacroPage ===
+ *
+ * Lively Theme CreateRandomLivelyThemeMacroPage action.
+ *
+ * Assumptions:
+ * - Lively Theme app installec
+ * - Space with key $spaceKey
+ *
+ * Procedure (SELENIUM):
+ * - Choose a Lively Theme macro by random
+ * - Create page in space $spaceKey with title containing macro ID and creation date
+ * - Insert Lively Theme macro chosen selected by random in step 1
+ * - Add page content that makes sense in combination with macro
+ *
+ * Result:
+ * - Page created in space $spaceKey with random LT macro in its content
+ *
  * @author Felix Grund
  */
 open class CreateRandomLivelyThemeMacroPage (

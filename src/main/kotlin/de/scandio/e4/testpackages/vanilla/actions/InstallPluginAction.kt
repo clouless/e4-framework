@@ -9,8 +9,8 @@ import java.util.*
 class InstallPluginAction(
         val pluginName: String,
         val pluginVersion: String,
-        val pluginLicense: String,
-        val pluginKey: String
+        val pluginLicense: String = "",
+        val pluginKey: String = ""
 ) : Action() {
 
     private var start: Long = 0

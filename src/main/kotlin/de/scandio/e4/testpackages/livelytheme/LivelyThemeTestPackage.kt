@@ -15,17 +15,27 @@ import de.scandio.e4.worker.interfaces.TestPackage
 /**
  * === LivelyThemeTestPackage ===
  *
- * Test package for Lively Theme Confluence virtual users.
+ * Test package for app "Lively Theme for Confluence".
  *
  * Assumptions:
- * TODO
+ * - Running Confluence
  *
  * Setup:
- * TODO
+ * - Install Lively Theme app (SELENIUM)
+ * - Set Lively Theme theme as global Confluence theme (SELENIUM)
+ * - Clear theme settings (SELENIUM)
+ * - Create space with key "LT" and name "Lively Theme" (REST)
+ * - Create page with title "macros" in space "LT" (REST)
+ * - Create 100 child pages of "macros" page in space "LT" (containing random Lively Theme macros) (REST)
  *
  * Virtual Users:
- * TODO
+ * - LivelyMacroPageReader (weight 0.2): reads random pages with Lively Theme macros
+ * - LivelyMacroPageCreator (weight 0.04): creates random pages with Lively Theme macros
+ * - LivelyThemeAdmin (weight 0.02): sets random custom theme elements in Lively Theme global settings
+ * - LivelySpaceToggler (weight 0.04): toggles space favorites
+ * - LivelyPageToggler 0.04 (weight ): toggles page favorites
  *
+ * Sum of weight is 0.34 which leaves 0.66 for vanilla virtual users.
  *
  * @author Felix Grund
  */
@@ -33,17 +43,17 @@ class LivelyThemeTestPackage: TestPackage {
 
     fun getSystemSetupActions(): ActionCollection {
         val actions = ActionCollection()
-        actions.add(InstallPluginAction("lively-theme", "3.1.1", LICENSE, PLUGIN_KEY))
+        actions.add(InstallPluginAction("lively-theme", "3.1.1"))
         actions.add(SetThemeAction("lively-theme"))
         actions.add(ClearThemeSettingsAction())
+        actions.add(CreateSpaceAction("LT", "Lively Theme", true))
+        actions.add(CreatePageAction("LT", "macros", "<p>macro pages</p>", true))
+        actions.add(SetupLivelyThemeMacroPages("LT", "macros", 100, MACRO_PAGES))
         return actions
     }
 
     override fun getSetupActions(): ActionCollection {
         val actions = ActionCollection()
-        actions.add(CreateSpaceAction("LT", "Lively Theme", true))
-        actions.add(CreatePageAction("LT", "macros", "<p>macro pages</p>", true))
-        actions.add(SetupLivelyThemeMacroPages("LT", "macros", 100, MACRO_PAGES))
         return actions
     }
 

@@ -8,6 +8,19 @@ import org.openqa.selenium.Dimension
 import java.util.*
 
 /**
+ * === ClearThemeSettingsAction ===
+ *
+ * Lively Theme ClearThemeSettingsAction action.
+ *
+ * Assumptions:
+ * - Lively Theme app installed
+ *
+ * Procedure (SELENIUM):
+ * - Navigate to global Lively Theme settings page and clear all settings
+ *
+ * Result:
+ * - All global Lively Theme settings are cleared
+ *
  * @author Felix Grund
  */
 open class ClearThemeSettingsAction : Action() {

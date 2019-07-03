@@ -14,14 +14,6 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
 
     private val E4_LICENSE_CONF = System.getenv("E4_LICENSE_CONF")
 
-    private fun runTestPackageSystemSetup() {
-        val testPackage = LivelyThemeTestPackage()
-        for (action in testPackage.getSystemSetupActions()) {
-            refreshWebClient(true)
-            action.execute(webConfluence, restConfluence)
-        }
-    }
-
     @Before
     fun before() {
 
@@ -55,10 +47,6 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
             webConfluence.disablePlugin("com.atlassian.plugins.base-hipchat-integration-plugin")
             refreshWebClient(true)
             webConfluence.disablePlugin("com.atlassian.confluence.plugins.confluence-onboarding")
-            refreshWebClient(true, true)
-            webConfluence.installPlugin("data-generator", "LATEST")
-
-            runTestPackageSystemSetup()
 
         } catch (e: Exception) {
             shot()

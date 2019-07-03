@@ -1,4 +1,4 @@
-package de.scandio.e4.testpackages.vanilla.actions
+package de.scandio.e4.testpackages.livelytheme.actions
 
 import de.scandio.e4.confluence.web.WebConfluence
 import de.scandio.e4.worker.confluence.rest.RestConfluence
@@ -10,6 +10,20 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 /**
+ * === FavPageToggleAction ===
+ *
+ * Lively Theme FavPageToggleAction action.
+ *
+ * Assumptions:
+ * - NONE
+ *
+ * Procedure (SELENIUM):
+ * - Navigate to a random page
+ * - Toggle the favorite page button
+ *
+ * Result:
+ * - Depending on previous state, page is now a favorite or not
+ *
  * @author Felix Grund
  */
 open class FavPageToggleAction : Action() {

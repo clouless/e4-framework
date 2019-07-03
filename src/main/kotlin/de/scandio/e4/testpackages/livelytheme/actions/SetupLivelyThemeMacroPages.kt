@@ -8,6 +8,20 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 /**
+ * === SetupLivelyThemeMacroPages ===
+ *
+ * Lively Theme SetupLivelyThemeMacroPages action.
+ *
+ * Assumptions:
+ * - Lively Theme app installed
+ *
+ * Procedure (SELENIUM):
+ * - Creates $howMany pages with random Lively Theme macros as children of page $parentPageTitle in
+ *   space with key $spaceKey
+ *
+ * Result:
+ * - Page with title $parentPageTitle in space $spaceKey has $howMany child pages with random LT macros
+ *
  * @author Felix Grund
  */
 open class SetupLivelyThemeMacroPages (

@@ -1,9 +1,6 @@
 package de.scandio.e4.testpackages.livelytheme
 
 import de.scandio.e4.testpackages.TestPackageTestRun
-import de.scandio.e4.testpackages.vanilla.actions.CreatePageAction
-import de.scandio.e4.testpackages.vanilla.actions.CreateSpaceAction
-import de.scandio.e4.testpackages.vanilla.actions.FavPageToggleAction
 import de.scandio.e4.worker.interfaces.TestPackage
 import org.junit.Before
 import org.junit.Test
@@ -12,8 +9,8 @@ class LivelyThemeTestRun : TestPackageTestRun() {
 
     private val BASE_URL = "http://confluence-cluster-6153-lb:26153/"
 //    private val BASE_URL = "http://e4-test:8090/"
-    private val OUT_DIR = "/tmp/e4/out"
-    private val IN_DIR = "/tmp/e4/in"
+    private val OUT_DIR = System.getenv("E4_OUTPUT_DIR")
+    private val IN_DIR = System.getenv("E4_INPUT_DIR")
     private val USERNAME = "admin"
     private val PASSWORD = "admin"
     private val TEST_PACKAGE = LivelyThemeTestPackage()
@@ -32,10 +29,10 @@ class LivelyThemeTestRun : TestPackageTestRun() {
 //            executeTestPackage(TEST_PACKAGE)
 
             // Run a single action for testing:
-            executeAction(CreatePageAction("LT", "macros", "<p>macro pages</p>", false))
+//            executeAction(CreatePageAction("LT", "macros", "<p>macro pages</p>", false))
 
             // Run single virtual user for testing:
-            // executeActions(BranchCreator().actions)
+             executeActions(TEST_PACKAGE.getSystemSetupActions())
         }
     }
 

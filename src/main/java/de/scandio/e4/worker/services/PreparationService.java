@@ -59,13 +59,13 @@ public class PreparationService {
 
         try {
             List<String> usernames = restConfluence.getConfluenceUsers();
-            List<UserCredentials> userCredentials = new ArrayList<>();
-            for (String username : usernames) {
-                if (!username.equals(config.getUsername())) {
-                    userCredentials.add(new UserCredentials(username, DEFAULT_USER_PASSWORD));
-                }
-            }
-            userCredentialsService.storeUsers(userCredentials);
+			List<UserCredentials> userCredentials = new ArrayList<>();
+			for (String username : usernames) {
+				if (!username.equals(config.getUsername())) {
+					userCredentials.add(new UserCredentials(username, DEFAULT_USER_PASSWORD));
+				}
+			}
+			userCredentialsService.storeUsers(userCredentials);
             if (!setupScenarios.isEmpty()) {
 				WebClient webClient;
 //            	if (!setupScenarios.allRestOnly()) {

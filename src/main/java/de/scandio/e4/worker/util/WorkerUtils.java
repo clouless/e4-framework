@@ -22,7 +22,10 @@ public class WorkerUtils {
 		WebDriverManager.chromedriver().setup();
 		ChromeOptions chromeOptions = new ChromeOptions();
 //		chromeOptions.addArguments("start-maximized");
-		chromeOptions.addArguments("enable-automation");
+		chromeOptions.addArguments("disable-extensions");
+//		chromeOptions.addArguments("disable-automation");
+		chromeOptions.addArguments("--start-maximized");
+		chromeOptions.addArguments("--disable-extensions");
 		chromeOptions.addArguments("--headless");
 		chromeOptions.addArguments("--disable-impl-side-painting");
 		chromeOptions.addArguments("--no-sandbox");

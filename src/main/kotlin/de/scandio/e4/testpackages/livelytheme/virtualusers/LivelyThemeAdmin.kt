@@ -25,9 +25,8 @@ import de.scandio.e4.worker.interfaces.WebClient
  * - NONE
  *
  * Actions:
- * - Set a random custom Lively Theme element in Theme Settings
- * - Create the associated page through the Lively Theme UI (i.e. using the different custom element
- *   edit buttons in the frontend)
+ * - Set a random custom Lively Theme element in Theme Settings and create the associated page through the
+ *   Lively Theme UI (i.e. using the different custom element edit buttons in the frontend)
  *
  * @author Felix Grund
  */

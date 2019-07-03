@@ -19,7 +19,7 @@ import de.scandio.e4.worker.interfaces.VirtualUser
  * - NONE
  *
  * Actions:
- * - Create page with a random Lively Theme macro in space "LT"
+ * - Create page with a random Lively Theme macro and associated page content in space "LT"
  *
  * @author Felix Grund
  */
