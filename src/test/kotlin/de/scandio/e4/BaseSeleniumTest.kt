@@ -1,5 +1,7 @@
-package de.scandio.e4.setup
+package de.scandio.e4
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.LoggerContext
 import de.scandio.e4.helpers.DomHelper
 import de.scandio.e4.confluence.web.WebConfluence
 import de.scandio.e4.worker.confluence.rest.RestConfluence
@@ -12,17 +14,16 @@ import org.openqa.selenium.chrome.ChromeOptions
 import org.slf4j.LoggerFactory
 import java.net.URI
 
-open abstract class SetupBaseTest {
+open abstract class BaseSeleniumTest {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    protected var BASE_URL = "http://confluence-cluster-6153-lb:26153/"
+    protected var BASE_URL = System.getenv("E4_TARGET_URL")
 //    protected var BASE_URL = "http://e4-test:8090/"
-    protected val OUT_DIR = "/tmp/e4/out"
-    protected val IN_DIR = "/tmp/e4/in"
+    protected val OUT_DIR = System.getenv("E4_OUT_DIR")
+    protected val IN_DIR = System.getenv("E4_IN_DIR")
     protected val USERNAME = "admin"
     protected val PASSWORD = "admin"
-    protected val DATA_GENERATOR_JAR_FILENAME = "data-generator-LATEST.jar"
 
     protected var driver: WebDriver
     protected var util: Util
@@ -46,8 +47,11 @@ open abstract class SetupBaseTest {
         this.dom.outDir = OUT_DIR
         this.dom.screenshotBeforeClick = true
         this.dom.screenshotBeforeInsert = true
-        this.webConfluence = WebConfluence(driver, URI(BASE_URL), OUT_DIR, USERNAME, PASSWORD)
+        this.webConfluence = WebConfluence(driver, URI(BASE_URL), IN_DIR, OUT_DIR, USERNAME, PASSWORD)
         this.restConfluence = RestConfluence(BASE_URL, USERNAME, PASSWORD)
+
+        val loggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
+        loggerContext.getLogger("org.apache").level = Level.WARN
     }
 
     open fun refreshWebClient(login: Boolean = false, authenticate: Boolean = false) {
@@ -65,7 +69,8 @@ open abstract class SetupBaseTest {
         this.dom.outDir = OUT_DIR
         this.dom.screenshotBeforeClick = true
         this.dom.screenshotBeforeInsert = true
-        this.webConfluence = WebConfluence(driver, URI(BASE_URL), OUT_DIR, USERNAME, PASSWORD)
+
+        this.webConfluence = WebConfluence(driver, URI(BASE_URL), IN_DIR, OUT_DIR, USERNAME, PASSWORD)
 
         if (login) {
             webConfluence.login()
@@ -78,13 +83,13 @@ open abstract class SetupBaseTest {
 
     open fun shot() {
         this.screenshotCount += 1
-        val path = this.util.takeScreenshot(driver, "$OUT_DIR/$screenshotCount-confluence-data-center-setup.png")
+        val path = webConfluence.takeScreenshot("$screenshotCount-selenium-test.png")
         println(path)
     }
 
     open fun dump() {
         this.dumpCount += 1
-        val path = this.util.dumpHtml(driver, "$OUT_DIR/$dumpCount-confluence-data-center-setup.html")
+        val path = webConfluence.dumpHtml("$dumpCount-selenium-test.html")
         println(path)
     }
 

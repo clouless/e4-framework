@@ -3,15 +3,18 @@ package de.scandio.e4.testpackages
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
 import de.scandio.e4.confluence.web.WebConfluence
+import de.scandio.e4.worker.client.NoopWebClient
 import de.scandio.e4.worker.collections.ActionCollection
 import de.scandio.e4.worker.confluence.rest.RestConfluence
 import de.scandio.e4.worker.interfaces.Action
 import de.scandio.e4.worker.interfaces.TestPackage
+import de.scandio.e4.worker.interfaces.WebClient
 import de.scandio.e4.worker.util.Util
 import de.scandio.e4.worker.util.WorkerUtils
 import org.openqa.selenium.Dimension
 import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getILoggerFactory
+import java.lang.Exception
 
 
 abstract class TestPackageTestRun {
@@ -26,6 +29,7 @@ abstract class TestPackageTestRun {
 
     abstract fun getBaseUrl(): String
     abstract fun getOutDir(): String
+    abstract fun getInDir(): String
     abstract fun getUsername(): String
     abstract fun getPassword(): String
     abstract fun getTestPackage(): TestPackage
@@ -63,17 +67,25 @@ abstract class TestPackageTestRun {
     }
 
     protected fun executeAction(action: Action) {
-        val webConfluence = WorkerUtils.newChromeWebClientPreparePhase(
-                getBaseUrl(), getOutDir(), getUsername(), getPassword()) as WebConfluence
-        webConfluence.webDriver.manage().window().size = Dimension(2000, 1500)
+        var webClient: WebClient = NoopWebClient()
+        if (!action.isRestOnly()) {
+            webClient = WorkerUtils.newChromeWebClient(
+                    getBaseUrl(), getInDir(), getOutDir(), getUsername(), getPassword()) as WebConfluence
+            webClient.webDriver.manage().window().size = Dimension(2000, 1500)
+        }
         val restConfluence = RestConfluence(getBaseUrl(), getUsername(), getPassword())
         log.info("Executing action ${action.javaClass.simpleName}")
-        action.execute(webConfluence, restConfluence)
         val runtimeName = "afteraction-${action.javaClass.simpleName}"
-        webConfluence.takeScreenshot(runtimeName)
-        webConfluence.dumpHtml(runtimeName)
-        webConfluence.quit()
-        log.info("Time taken: ${action.timeTaken}")
+        try {
+            action.execute(webClient, restConfluence)
+            log.info("Time taken: ${action.timeTaken}")
+        } finally {
+            if (!action.isRestOnly()) {
+                webClient.takeScreenshot(runtimeName)
+                webClient.dumpHtml(runtimeName)
+                webClient.quit()
+            }
+        }
     }
 
     protected fun executeActions(actions: ActionCollection): Measurement {
@@ -81,8 +93,13 @@ abstract class TestPackageTestRun {
         var numExcludedActions = 0
         var numActionsRun = 0
         for (action in actions) {
-            val webConfluence = WorkerUtils.newChromeWebClientPreparePhase(
-                    getBaseUrl(), getOutDir(), getUsername(), getPassword()) as WebConfluence
+            var webConfluence: WebClient
+            if (actions.allRestOnly()) {
+                webConfluence = NoopWebClient()
+            } else {
+                webConfluence = WorkerUtils.newChromeWebClient(
+                        getBaseUrl(), getInDir(), getOutDir(), getUsername(), getPassword()) as WebConfluence
+            }
             val restConfluence = RestConfluence(getBaseUrl(), getUsername(), getPassword())
             try {
                 log.info("Executing action ${action.javaClass.simpleName}")

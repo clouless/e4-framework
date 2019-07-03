@@ -25,7 +25,7 @@ import de.scandio.e4.worker.interfaces.WebClient
  *
  * @author Felix Grund
  */
-class BranchedPageReader : VirtualUser {
+class BranchedPageReader : VirtualUser() {
 
     override fun getActions(): ActionCollection {
         val actions = ActionCollection()

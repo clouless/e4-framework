@@ -1,15 +1,13 @@
 {
   "target": {
-    "url": "http://confluence-baseurl-with-port",
+    "url": "http://confluence-cluster-6153-lb:26153/",
     "adminUser": "admin",
     "adminPassword": "admin"
   },
   "testPackage": "de.scandio.e4.testpackages.vanilla.VanillaTestPackage",
-  "numConcurrentUsers": 250,
+  "numConcurrentUsers": 50,
   "durationInSeconds": 600,
   "workers": [
-    "http://url-worker-1",
-    "http://url-worker-2",
-    "http://url-worker-3"
+    "http://e4w-oregon:3000"
   ]
 }

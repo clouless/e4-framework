@@ -20,8 +20,7 @@ import de.scandio.e4.worker.interfaces.TestPackage
  * - Running Confluence with Page Branching app installed
  *
  * Setup:
- * - Create space with key "PB"
- * - Give "removepage" space permission to confluence-users group
+ * - Create space with key "PB" and name "E4 Page Branching Space"
  * - Create page with title "PB Root Origin" in space "PB"
  * - Create branch of page "PB Root Origin"
  * - Create page with title "PB BranchOverviewReader Origin"

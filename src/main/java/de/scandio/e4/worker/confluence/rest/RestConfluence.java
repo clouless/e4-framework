@@ -1,11 +1,11 @@
 package de.scandio.e4.worker.confluence.rest;
 
 import com.google.gson.Gson;
-import de.scandio.e4.client.config.ClientConfig;
 import de.scandio.e4.worker.interfaces.RestClient;
 import de.scandio.e4.worker.util.WorkerUtils;
 import org.apache.commons.codec.binary.Base64;
-import org.jetbrains.annotations.NotNull;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -15,8 +15,8 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +25,8 @@ public class RestConfluence implements RestClient {
 	private static final Logger log = LoggerFactory.getLogger(RestConfluence.class);
 
 	private static final Gson GSON = new Gson();
+
+	private Map<String, Long> contentIds = new HashMap<>();
 
 	private String username;
 	private String password;
@@ -44,71 +46,140 @@ public class RestConfluence implements RestClient {
 		return sendGetRequestReturnBody(urlAfterBaseUrl);
 	}
 
-	public List<Long> findContentIds(int limit, String type) {
-		List<Long> pageIds = new ArrayList<>();
-		String url;
-		if (type != null) {
-			url = String.format("rest/api/content?type=%s&start=0&limit=%s", type, limit);
+	public List<Long> findContentIds(int limit, String type, String spaceKey) {
+		String url = "rest/api/content?start=0&limit=%s";
+		if (type != null && spaceKey != null) {
+			url = String.format(url + "&type=%s&spaceKey=%s", limit, type, spaceKey);
+		} else if (spaceKey != null) {
+			url = String.format(url + "&spaceKey=%s", limit, spaceKey);
+		} else if (type != null) {
+			url = String.format(url + "&type=%s", limit, type);
 		} else {
-			url = String.format("rest/api/content?start=0&limit=%s", limit);
+			url = String.format(url, limit);
 		}
-
 		String body = sendGetRequestReturnBody(url);
-		Map<String, Object> response = GSON.fromJson(body, Map.class);
-		List<Map> pageObjects = (ArrayList) response.get("results");
+		return getContentIdsFromResponse(body);
+	}
+
+	private List<Long> getContentIdsFromResponse(String body) {
+		List<Long> ids = new ArrayList<>();
+		List<Map> pageObjects = getResultListFromResponse(body);
 		for (Map pageObj : pageObjects) {
-			long pageId = Long.parseLong((String) pageObj.get("id"));
-			pageIds.add(pageId);
+			long id = Long.parseLong((String) pageObj.get("id"));
+			ids.add(id);
 		}
-		return pageIds;
+		return ids;
 	}
 
 	public List<Long> findPages(int limit) {
-		return findContentIds(limit, "page");
+		return findContentIds(limit, "page", null);
 	}
 
 	public List<Long> findBlogposts(int limit) {
-		return findContentIds(limit, "blogpost");
+		return findContentIds(limit, "blogpost", null);
 	}
 
 	public Long getRandomContentId() {
-		return WorkerUtils.getRandomItem(findContentIds(1000, null));
+		return getRandomContentId(null, null);
+	}
+
+
+	public Long getRandomContentId(String spaceKey, String parentPageTitle) {
+		Long contentId;
+		if (StringUtils.isBlank(parentPageTitle)) {
+			contentId = WorkerUtils.getRandomItem(findContentIds(1000, null, spaceKey));
+		} else {
+			contentId = WorkerUtils.getRandomItem(findChildPageIds(spaceKey, parentPageTitle));
+		}
+		return contentId;
+	}
+
+	private List<Long> findChildPageIds(String spaceKey, String parentPageTitle) {
+		Long parentContentId = contentIds.get(spaceKey + ":" + parentPageTitle);
+		if (parentContentId == null) {
+			parentContentId = getPageId(spaceKey, parentPageTitle);
+		}
+		String restUrl = "rest/api/content/"+parentContentId+"/child/page";
+		String responseText = sendGetRequestReturnBody(restUrl);
+		return getContentIdsFromResponse(responseText);
 	}
 
 	public List<String> getConfluenceUsers() {
 		List<String> usernames = new ArrayList<>();
 		String body = sendGetRequestReturnBody("rest/api/group/confluence-users/member");
-		Map<String, Object> response = GSON.fromJson(body, Map.class);
-		List<Map> userObjects = (ArrayList) response.get("results");
-		for (Map userObject : userObjects) {
-			String username = (String) userObject.get("username");
-			usernames.add(username);
+		return getListFromResponse(String.class, "username", body);
+//		List<Map> userObjects = getResultListFromResponse(body);
+//		for (Map userObject : userObjects) {
+//			String username = (String) userObject.get("username");
+//			usernames.add(username);
+//		}
+//		return usernames;
+	}
+
+	private <T> List<T> getListFromResponse(Class<T> clazz, String key, String responseText) {
+		List<T> ret = new ArrayList<>();
+		List<Map> maps = getResultListFromResponse(responseText);
+		for (Map obj : maps) {
+			T item = (T) obj.get(key);
+			ret.add(item);
 		}
-		return usernames;
+		return ret;
 	}
 
-	public String createPage(String pageTitle, String spaceKey, String content, String parentPageId) {
-		String bodyTemplate = "{\"type\":\"page\",\"ancestors\":[{\"id\":%s}]\"title\":\"%s\",\"space\":{\"key\":\"%s\"},\"body\":{\"storage\":{\"value\":\"%s\",\"representation\":\"storage\"}}}";
-		String body = String.format(bodyTemplate, parentPageId, pageTitle, spaceKey, content);
-		return sendPostRequest("content/", body);
+	public String createPage(String spaceKey, String pageTitle, String content) {
+		return createPage(spaceKey, pageTitle, content, null);
 	}
 
-	public String createSpace(String spaceKey, String spaceName) {
-		String spaceDesc = "E4 created space. Enjoy!";
-//		String bodyTemplate = "{\"key\":\"%s\",\"name\":\"%s\",\"description\":{\"plain\":{\"value\":\"%s\",\"representation\":\"plain\"}},\"metadata\":{}}";
-		String bodyTemplate = "{\"key\":\"TST\",\"name\":\"Example space\",\"description\":{\"plain\":{\"value\":\"This is an example space\",\"representation\":\"plain\"}},\"metadata\":{}}";
-		String body = String.format(bodyTemplate, spaceKey, spaceName, spaceDesc);
+	public String createPage(String spaceKey, String pageTitle, String content, String parentPageTitle) {
+		content = StringEscapeUtils.escapeJson(content);
+		String bodyTemplate, body;
+		if (StringUtils.isNotBlank(parentPageTitle)) {
+			long parentPageId = getPageId(spaceKey, parentPageTitle);
+			bodyTemplate = "{\"type\":\"page\",\"ancestors\":[{\"id\":%s}],\"title\":\"%s\",\"space\":{\"key\":\"%s\"},\"body\":{\"storage\":{\"value\":\"%s\",\"representation\":\"storage\"}}}";
+			body = String.format(bodyTemplate, parentPageId, pageTitle, spaceKey, content);
+		} else {
+			bodyTemplate = "{\"type\":\"page\",\"title\":\"%s\",\"space\":{\"key\":\"%s\"},\"body\":{\"storage\":{\"value\":\"%s\",\"representation\":\"storage\"}}}";
+			body = String.format(bodyTemplate, pageTitle, spaceKey, content);
+		}
 		return sendPostRequest("rest/api/content/", body);
 	}
 
+	public Long getPageId(String spaceKey, String pageTitle) {
+		String responseText = findPage(spaceKey, pageTitle);
+		List<Map> pages = getResultListFromResponse(responseText);
+		return Long.parseLong((String) pages.get(0).get("id"));
+	}
+
+	public String createSpace(String spaceKey, String spaceName) {
+		String spaceDesc = "Space used for testing";
+//		String bodyTemplate = "{\"key\":\"%s\",\"name\":\"%s\",\"description\":{\"plain\":{\"value\":\"%s\",\"representation\":\"plain\"}},\"metadata\":{}}";
+		String bodyTemplate = "{\"key\":\"%s\",\"name\":\"%s\",\"description\":{\"plain\":{\"value\":\"%s\",\"representation\":\"plain\"}},\"metadata\":{}}";
+		String body = String.format(bodyTemplate, spaceKey, spaceName, spaceDesc);
+		return sendPostRequest("rest/api/space/", body);
+	}
+
+	private List<Map> getResultListFromResponse(String responseText) {
+		Map<String, Object> response = GSON.fromJson(responseText, Map.class);
+		List<Map> pageObjects = (ArrayList) response.get("results");
+		return pageObjects;
+	}
+
+	private String sendPutRequest(String urlAfterBaseUrl, String body) {
+		return sendPostOrPutRequest(HttpMethod.PUT, urlAfterBaseUrl, body);
+	}
+
 	private String sendPostRequest(String urlAfterBaseUrl, String body) {
+		return sendPostOrPutRequest(HttpMethod.POST, urlAfterBaseUrl, body);
+	}
+
+	private String sendPostOrPutRequest(HttpMethod method, String urlAfterBaseUrl, String body) {
 		final String url = this.baseUrl + urlAfterBaseUrl;
 		RestTemplate restTemplate = new RestTemplate(new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()));
-		List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
-		interceptors.add(new LoggingRequestInterceptor());
-		restTemplate.setInterceptors(interceptors);
+//		List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
+//		interceptors.add(new LoggingRequestInterceptor());
+//		restTemplate.setInterceptors(interceptors);
 
-		log.debug("Sending POST request {{}} with body {{}}", url, body);
+		log.debug("Sending {{}} request {{}} with body {{}}", method, url, body);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Authorization", getBasicAuth());
@@ -118,14 +189,13 @@ public class RestConfluence implements RestClient {
 
 		ResponseEntity<String> response;
 		try {
-			response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
+			response = restTemplate.exchange(url, method, request, String.class);
 		} catch (HttpClientErrorException e) {
-			log.error("Exception sending REST POST request for user {{}} with password {{}} and URL {{}}", this.username, this.password, url);
+			log.error("Exception sending REST {{}} request for user {{}} with password {{}} and URL {{}}",
+					method, this.username, this.password, url);
 			throw e;
 		}
-		String responseText = response.getBody();
-//		log.debug("Response text {{}}", responseText);
-		return responseText;
+		return response.getBody();
 	}
 
 	public int sendGetRequestReturnStatus(String urlAfterBaseUrl) {

@@ -1,34 +1,33 @@
 package de.scandio.e4.setup
 
+import de.scandio.e4.BaseSeleniumTest
+import org.junit.After
 import org.junit.Test
 import kotlin.test.assertTrue
 
-class InstallPageBranching : SetupBaseTest() {
+class InstallPageBranching : BaseSeleniumTest() {
 
-    val PB_JAR_FILE_PATH = "/tmp/e4/in/page-branching-1.2.0.jar"
-
-    val ROW_SELECTOR = ".upm-plugin[data-key='de.scandio.confluence.plugins.page-branching']"
-    val LICENSE_SELECTOR = "$ROW_SELECTOR textarea.edit-license-key"
-    val LICENSE = "AAABOA0ODAoPeNqVkV9PwjAUxd/7KZr4vGUbAZSkiToWNWFABH3y5dLdjSalW247At/ewpgaow88NOmfc8/9ndubvDY8hyNPIh7fTpJkEkU8na79Ob5j83a3QVqUbxbJiiBmU7SSVONUbcQSKuSPBEZulal4WRNPa1PqFo3EjwnP9qBbOElZSnjeTMGhODkH0TBIYub1DqSbww5FiVodwopaU9xbCaZQdVhgL8lyUPo/zXcn4ahFppVEY/HdQ5/uEuaLjUPjUTE7NIqOP0BGQRKxAsPeT35lCBvdVsrYsPFJg02fNPQ4ao9dqwVVYJTtmq86C/602zyzVTYXfgWzeDAajMfDMZt1WH8TXB7XxwbP40gXeZ69pi8Ps+vgVg7IIYkStMXrStHPiBpS9pJt2ZLcgsXfv/YJlTfDSTAsAhQ8YDyCfUAyEm1uFV0+INy9Ywp3YAIUTk/kpoQImX1esfH2Zp08B6IiGnQ=X02fj"
+    val PLUGIN_NAME = "page-branching"
+    val PLUGIN_VERSION = "1.2.0"
+    val PLUGIN_KEY = "de.scandio.confluence.plugins.page-branching"
+    val PLUGIN_LICENSE = System.getenv("E4_LICENSE_PB")
 
     @Test
     fun test() {
         try {
             webConfluence.login()
             webConfluence.authenticateAdmin()
-            webConfluence.installPlugin(PB_JAR_FILE_PATH)
-            dom.click("#upm-plugin-status-dialog .cancel")
-//            dom.click("$ROW_SELECTOR .upm-plugin-license-edit")
-//            dom.clearText(LICENSE_SELECTOR)
-            dom.insertText(LICENSE_SELECTOR, LICENSE)
-            dom.awaitSeconds(5)
-            dom.click("$ROW_SELECTOR .submit-license")
-            dom.awaitSeconds(5)
-
+            webConfluence.installPlugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_KEY, PLUGIN_LICENSE)
             assertTrue(dom.isElementPresent("#upm-plugin-status-dialog") || dom.isElementPresent(".upm-plugin-license-edit"))
         } catch (e: Exception) {
             shot()
+            throw e
         }
+    }
+
+    @After
+    fun after() {
+        webConfluence.quit()
     }
 
 }

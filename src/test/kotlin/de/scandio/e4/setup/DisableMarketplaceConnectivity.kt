@@ -1,9 +1,9 @@
 package de.scandio.e4.setup
 
+import de.scandio.e4.BaseSeleniumTest
 import org.junit.Test
-import java.util.concurrent.TimeoutException
 
-class DisableMarketplaceConnectivity : SetupBaseTest() {
+class DisableMarketplaceConnectivity : BaseSeleniumTest() {
 
     @Test
     fun test() {

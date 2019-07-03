@@ -34,4 +34,13 @@ public class ActionCollection extends ArrayList<Action> {
 		}
 	}
 
+	public boolean allRestOnly() {
+		for (Action action : this) {
+			if (!action.isRestOnly()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 }

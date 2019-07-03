@@ -1,17 +1,18 @@
 package de.scandio.e4.setup
 
+import de.scandio.e4.BaseSeleniumTest
+import de.scandio.e4.testpackages.livelytheme.LivelyThemeTestPackage
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.slf4j.LoggerFactory
 
 
-open class ConfluenceDataCenterSetup : SetupBaseTest() {
+open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
     private val E4_LICENSE_CONF = System.getenv("E4_LICENSE_CONF")
-    private val E4_LICENSE_PAGEBRANCHING = System.getenv("E4_LICENSE_PAGEBRANCHING")
 
     @Before
     fun before() {
@@ -26,30 +27,27 @@ open class ConfluenceDataCenterSetup : SetupBaseTest() {
     @Test
     fun test() {
         try {
-            setupStep1()
-            dom.awaitMinutes(4)
+            setupDatabase()
             pollTillDbReady()
             webConfluence.takeScreenshot("db-ready")
-            setupStep2()
-            refreshWebClient(true, true)
+            postDbSetup()
 
             /* Step 9: Admin config */
-            webConfluence.disableMarketplaceConnectivity()
             refreshWebClient(true, true)
             webConfluence.disableSecureAdminSessions()
-            refreshWebClient(true, true)
+            refreshWebClient(true)
+            webConfluence.disableMarketplaceConnectivity()
+            refreshWebClient(true)
             webConfluence.disableCaptchas()
-            refreshWebClient(true, true)
+            refreshWebClient(true)
             webConfluence.setLogLevel("co.goodsoftware", "INFO")
-            refreshWebClient(true, true)
+            refreshWebClient(true)
             webConfluence.disablePlugin("com.atlassian.troubleshooting.plugin-confluence")
-            refreshWebClient(true, true)
+            refreshWebClient(true)
             webConfluence.disablePlugin("com.atlassian.plugins.base-hipchat-integration-plugin")
-            refreshWebClient(true, true)
-            webConfluence.installPlugin("$IN_DIR/$DATA_GENERATOR_JAR_FILENAME")
+            refreshWebClient(true)
+            webConfluence.disablePlugin("com.atlassian.confluence.plugins.confluence-onboarding")
 
-            refreshWebClient(true, true)
-            installPageBranching()
         } catch (e: Exception) {
             shot()
             dump()
@@ -59,23 +57,7 @@ open class ConfluenceDataCenterSetup : SetupBaseTest() {
         }
     }
 
-    fun installPageBranching() {
-        val PB_JAR_FILE_PATH = "/tmp/e4/in/page-branching-1.2.0.jar"
-
-        val ROW_SELECTOR = ".upm-plugin[data-key='de.scandio.confluence.plugins.page-branching']"
-        val LICENSE_SELECTOR = "$ROW_SELECTOR textarea.edit-license-key"
-
-        webConfluence.login()
-        webConfluence.authenticateAdmin()
-        webConfluence.installPlugin(PB_JAR_FILE_PATH)
-        dom.click("#upm-plugin-status-dialog .cancel")
-        dom.insertText(LICENSE_SELECTOR, E4_LICENSE_PAGEBRANCHING)
-        dom.awaitSeconds(5)
-        dom.click("$ROW_SELECTOR .submit-license")
-        dom.awaitSeconds(5)
-    }
-
-    fun setupStep1() {
+    fun setupDatabase() {
         driver.navigate().to(BASE_URL) // TODO use webConfluence.navigateTo
         dom.awaitSeconds(3) // just wait a bit for safety
 
@@ -112,12 +94,10 @@ open class ConfluenceDataCenterSetup : SetupBaseTest() {
         dom.awaitElementVisible("#setupdb-successMessage") // not sure if this is working
         dom.click("#setup-next-button")
 
-        /* This takes a few minutes! Make sure the next step has a wait value! */
-        log.info("Database setup in progress. This takes a while. Grab some coffee... :)")
         shot()
     }
 
-    fun setupStep2() {
+    fun postDbSetup() {
         webConfluence.navigateTo("setup/setupdata-start.action")
         /* Step 6: Setup data */
         dom.click("input[Value='Empty Site']")
@@ -135,23 +115,14 @@ open class ConfluenceDataCenterSetup : SetupBaseTest() {
 
 
         dom.click(".setup-success-button .aui-button-primary.finishAction")
+        dom.awaitSeconds(10)
 
         dom.insertText("#grow-intro-space-name", "TEST")
         dom.click("#grow-intro-create-space")
-        dom.awaitSeconds(10)
+        dom.awaitSeconds(20)
         webConfluence.navigateTo("logout.action")
-//        dom.click("#onboarding-skip-editor-tutorial")
-//        dom.click("#editor-precursor > .cell")
-//        dom.click("#content-title")
-//        dom.insertText("#content-title", "Test Page")
-//        dom.click("#rte-button-publish")
-//        dom.awaitElementClickable("#main-content")
 
         shot()
-    }
-
-    fun setupStep3() {
-
     }
 
     private fun pollTillDbReady() {
@@ -165,8 +136,8 @@ open class ConfluenceDataCenterSetup : SetupBaseTest() {
                 log.info("+++++++++++++++++++++++++++++++++++++++++!")
                 log.info("+++++++++++ Done with DB Setup ++++++++++!")
                 log.info("+++++++++++++++++++++++++++++++++++++++++!")
-                log.info("But waiting for another safety minute because the setup wizard is buggy...")
-                dom.awaitMinutes(1)
+//                log.info("But waiting for another safety minute because the setup wizard is buggy...")
+//                dom.awaitMinutes(1)
                 break
             }
 

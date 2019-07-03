@@ -16,7 +16,7 @@ import de.scandio.e4.worker.interfaces.WebClient
  *
  * @author Felix Grund
  */
-class Commentor : VirtualUser {
+class Commentor : VirtualUser() {
 
     override fun getActions(): ActionCollection {
         val actions = ActionCollection()

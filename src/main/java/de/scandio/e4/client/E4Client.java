@@ -56,8 +56,8 @@ public class E4Client {
 		VirtualUserCollection vusers = testPackageInstance.getVirtualUsers();
 		for (Class<? extends VirtualUser> virtualUserClass : vusers) {
 			double weight = vusers.getWeight(virtualUserClass);
-			String formula = "Weight("+weight+") % 0.04 == 0";
-			boolean legalWeight = (weight * 100) % (int)(0.04*100) == 0;
+			String formula = "Weight("+weight+") % 0.02 == 0";
+			boolean legalWeight = (int)(weight * 100) % (int)(0.02*100) == 0;
 			if (!legalWeight) {
 				throw new Exception("Illegal weight {"+weight+"}. Current formula: " + formula);
 			}
@@ -79,6 +79,10 @@ public class E4Client {
 			if (parsedArgs.hasOption("output-dir")) {
 				put("output.dir", parsedArgs.getOptionValue("output-dir"));
 				log.info("Set custom output dir: " + get("output.dir"));
+			}
+			if (parsedArgs.hasOption("input-dir")) {
+				put("input.dir", parsedArgs.getOptionValue("input-dir"));
+				log.info("Set custom input dir: " + get("input.dir"));
 			}
 		}};
 
