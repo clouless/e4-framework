@@ -24,6 +24,10 @@ public abstract class Action {
 
 	public abstract long getTimeTaken();
 
+	public boolean isRestOnly() {
+		return false;
+	}
+
 	public String getNodeId(@NotNull WebClient webClient) {
 		return webClient.getNodeId();
 	}

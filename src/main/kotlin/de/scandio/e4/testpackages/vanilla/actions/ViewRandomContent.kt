@@ -9,7 +9,10 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 
-open class ViewRandomContent : Action() {
+open class ViewRandomContent(
+        val spaceKey: String = "",
+        val parentPageTitle: String = ""
+) : Action() {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -21,7 +24,7 @@ open class ViewRandomContent : Action() {
         val webConfluence = webClient as WebConfluence
         val restConfluence = restClient as RestConfluence
         // IMPORTANT: do this before measuring because it invokes a REST call!
-        val randomContentId = restConfluence.randomContentId
+        val randomContentId = restConfluence.getRandomContentId(spaceKey, parentPageTitle)
         webConfluence.login()
         this.start = Date().time
         webConfluence.goToPage(randomContentId)

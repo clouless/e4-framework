@@ -57,9 +57,9 @@ class DomHelper(
         select.selectByValue(value)
     }
 
-    fun executeScript(script: String) {
+    fun executeScript(script: String): Any {
         val js = driver as JavascriptExecutor
-        js.executeScript(script)
+        return js.executeScript(script)
     }
 
     fun insertTextCodeMirror(value: String) {
@@ -105,11 +105,18 @@ class DomHelper(
         wait(ExpectedConditions.attributeContains(By.cssSelector(selector), "value", value))
     }
 
-    fun insertText(selector: String, text: String, awaitClickableSeconds: Long = this.defaultWaitTillPresent) {
+    fun awaitSelected(selector: String) {
+        wait(ExpectedConditions.elementToBeSelected(By.cssSelector(selector)))
+    }
+
+    fun insertText(selector: String, text: String, clearText: Boolean = false) {
         if (this.screenshotBeforeInsert) {
             this.util.takeScreenshot(driver, "$outDir/insert-$selector.png")
         }
-        awaitElementPresent(selector, awaitClickableSeconds)
+        awaitElementPresent(selector)
+        if (clearText) {
+            clearText(selector)
+        }
         findElement(selector).sendKeys(text)
         awaitMilliseconds(50)
     }
@@ -188,5 +195,26 @@ class DomHelper(
                 condition
         )
         awaitMilliseconds(10)
+    }
+
+    fun clickAll(selector: String) {
+        for (element in findElements(selector)) {
+            click(element)
+            awaitMilliseconds(50)
+        }
+    }
+
+    fun unselectAll(selector: String) {
+        for (element in findElements(selector)) {
+            if (element.isSelected) {
+                element.click()
+            }
+        }
+    }
+
+    fun insertHtmlInEditor(containerSelector: String, html: String) {
+        driver.switchTo().frame("wysiwygTextarea_ifr")
+        executeScript("$('$containerSelector').html('$html');")
+        driver.switchTo().parentFrame()
     }
 }

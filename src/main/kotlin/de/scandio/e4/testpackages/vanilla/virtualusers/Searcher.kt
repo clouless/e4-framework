@@ -15,7 +15,7 @@ import de.scandio.e4.worker.interfaces.WebClient
  *
  * @author Felix Grund
  */
-class Searcher : VirtualUser {
+class Searcher : VirtualUser() {
 
     override fun getActions(): ActionCollection {
         val actions = ActionCollection()

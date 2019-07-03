@@ -8,7 +8,9 @@ import java.util.*
 
 class InstallPluginAction(
         val pluginName: String,
-        val pluginVersion: String
+        val pluginVersion: String,
+        val pluginLicense: String = "",
+        val pluginKey: String = ""
 ) : Action() {
 
     private var start: Long = 0
@@ -17,9 +19,8 @@ class InstallPluginAction(
     override fun execute(webClient: WebClient, restClient: RestClient) {
         val webConfluence = webClient as WebConfluence
         webConfluence.login()
-        webConfluence.authenticateAdmin()
         this.start = Date().time
-        webConfluence.installPlugin(pluginName, pluginVersion)
+        webConfluence.installPlugin(pluginName, pluginVersion, pluginLicense, pluginKey)
         this.end = Date().time
     }
 

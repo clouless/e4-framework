@@ -6,12 +6,14 @@ import de.scandio.e4.worker.util.RandomData
 import de.scandio.e4.worker.util.WorkerUtils
 import org.apache.commons.io.FileUtils
 import org.openqa.selenium.*
+import org.openqa.selenium.interactions.Actions
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.lang.Exception
 import java.net.URI
 import java.net.URLEncoder
 import java.util.*
+import kotlin.collections.HashMap
 
 class WebConfluence(
         var driver: WebDriver,
@@ -21,6 +23,11 @@ class WebConfluence(
         val username: String,
         val password: String
 ): WebClient {
+
+    constructor(oldWebConfluence: WebConfluence) : this(
+            oldWebConfluence.driver, oldWebConfluence.base, oldWebConfluence.inputDir,
+            oldWebConfluence.outputDir, oldWebConfluence.username, oldWebConfluence.password
+    )
 
     // TODO: this is a bit weird because the original driver came from outside in the constructor..
     override fun refreshDriver() {
@@ -61,24 +68,24 @@ class WebConfluence(
         // Do the following if you want to do it only initially when the browser is opened
         // if (driver.currentUrl.equals("about:blank") || driver.currentUrl.equals("data:,")) { // only login once!
         navigateTo("login.action")
-        dom.awaitElementPresent("form[name='loginform'], .login-section p.last, #main-content", 20)
+        dom.awaitElementPresent("form[name='loginform'], .login-section p.last, #main-content", 40)
         if (dom.isElementPresent("form[name='loginform']")) {
             dom.insertText("#os_username", this.username)
             dom.insertText("#os_password", this.password)
             dom.click("#loginButton")
             try {
-                dom.awaitElementPresent(".pagebody", 20)
+                dom.awaitElementPresent(".pagebody", 40)
                 if (dom.isElementPresent("#dashboard-onboarding-dialog")) {
                     dom.click("#dashboard-onboarding-dialog .aui-button-primary")
                     dom.awaitMilliseconds(50)
                 }
             } catch (e: TimeoutException) {
-                dom.click("#grow-intro-video-skip-button", 20)
+                dom.click("#grow-intro-video-skip-button", 40)
                 dom.click("#grow-ic-content button[data-action='skip']")
-                dom.click(".intro-find-spaces-relevant-spaces label:first-child .intro-find-spaces-space")
+                dom.click(".intro-find-spaces-relevant-spaces text:first-child .intro-find-spaces-space")
                 dom.awaitMilliseconds(1000)
                 dom.click(".intro-find-spaces-button-continue")
-                dom.awaitElementPresent(".pagebody", 20)
+                dom.awaitElementPresent(".pagebody", 40)
             }
         } else {
             log.debug("Went to login screen but was already logged in")
@@ -100,6 +107,10 @@ class WebConfluence(
         } else {
             log.info("[SELENIUM] Already on page")
         }
+    }
+
+    fun navigateToBaseUrl() {
+        driver.navigate().to(base.toString())
     }
 
     override fun takeScreenshot(screenshotName: String): String {
@@ -150,9 +161,18 @@ class WebConfluence(
         dom.awaitElementPresent("#main-content")
     }
 
+    fun goToSpaceHomePage(spaceKey: String) {
+        navigateTo("display/$spaceKey")
+        dom.awaitElementPresent("#main-content")
+    }
+
     fun goToEditPage() {
         dom.awaitElementClickable("#editPageLink")
         dom.click("#editPageLink")
+        awaitEditPageLoaded()
+    }
+
+    fun awaitEditPageLoaded() {
         dom.awaitElementClickable("#content-title-div", 40)
     }
 
@@ -163,25 +183,42 @@ class WebConfluence(
 
     fun openMacroBrowser(macroId: String, macroSearchTerm: String) {
         log.debug("Trying to insert macro {{}}", macroId)
+        driver.switchTo().frame("wysiwygTextarea_ifr")
+        debugScreen("openMacroBrowser-0")
+        dom.click("#tinymce")
+        driver.switchTo().parentFrame()
         dom.click("#rte-button-insert")
-        debugScreen("insert-macro-1")
+        debugScreen("openMacroBrowser-1")
         dom.click("#rte-insert-macro")
-        debugScreen("insert-macro-2")
+        debugScreen("openMacroBrowser-2")
         dom.insertText("#macro-browser-search", macroSearchTerm)
-        debugScreen("insert-macro-3")
+        debugScreen("openMacroBrowser-3")
         dom.click("#macro-$macroId")
-        debugScreen("insert-macro-4")
+        debugScreen("openMacroBrowser-4")
     }
 
     fun saveMacroBrowser() {
         dom.click("#macro-details-page button.ok", 5)
-        debugScreen("insert-macro-5")
+        debugScreen("saveMacroBrowser-1")
         dom.awaitElementClickable("#rte-button-publish")
         dom.awaitMilliseconds(50)
     }
 
-    fun insertMacro(macroId: String, macroSearchTerm: String) {
+    fun insertMacro(macroId: String, macroSearchTerm: String, macroParameters: Map<String, String> = emptyMap()) {
         openMacroBrowser(macroId, macroSearchTerm)
+        debugScreen("after-openMacroBrowser")
+        if (!macroParameters.isEmpty()) {
+            for ((paramKey, paramValue) in macroParameters) {
+                val selector = "#macro-browser-dialog #macro-param-$paramKey"
+                val elem = dom.findElement(selector)
+                if ("select".equals(elem.tagName)) {
+                    dom.setSelectedOption(selector, paramValue)
+                } else {
+                    dom.insertText(selector, paramValue)
+                }
+            }
+        }
+        debugScreen("after-setParams")
         saveMacroBrowser()
     }
 
@@ -208,32 +245,46 @@ class WebConfluence(
         dom.awaitElementPresent("#main-content")
     }
 
+    private fun getPageId(): Number {
+        return dom.executeScript("AJS.Meta.get(\"page-id\")").toString().toInt()
+    }
+
     fun createDefaultPage(pageTitleBeginning: String) {
         dom.click("#quick-create-page-button")
         dom.awaitElementPresent("#wysiwyg")
         val pageTitle = "$pageTitleBeginning $username (${Date().time})"
         log.debug("Creating page with title $pageTitle")
-        publishDefaultPage(pageTitle)
+        publishPage(pageTitle)
     }
 
     fun createDefaultPage(spaceKey: String, pageTitle: String) {
         navigateTo("pages/createpage.action?spaceKey=$spaceKey")
         dom.awaitElementPresent("#wysiwyg")
-        publishDefaultPage(pageTitle)
+        publishPage(pageTitle)
     }
 
-    private fun setPageTitleInEditor(pageTitle: String) {
+    fun createCustomPage(spaceKey: String, pageTitle: String, pageContentHtml: String) {
+        navigateTo("pages/createpage.action?spaceKey=$spaceKey")
+        dom.awaitElementPresent("#wysiwyg")
+        publishPage(pageTitle, pageContentHtml)
+    }
+
+    fun setPageTitleInEditor(pageTitle: String) {
         dom.click("#content-title-div")
         dom.insertText("#content-title", pageTitle)
     }
 
-    private fun publishDefaultPage(pageTitle: String) {
+    private fun publishPage(pageTitle: String, pageContentHtml: String = "") {
+        var html = pageContentHtml
+        if (html.isEmpty()) {
+            html = "<h1>Lorem Ipsum</h1><p>${RandomData.STRING_LOREM_IPSUM}</p>"
+        }
         if (dom.isElementPresent("#closeDisDialog")) {
             dom.click("#closeDisDialog")
             dom.awaitMilliseconds(100)
         }
         setPageTitleInEditor(pageTitle)
-        dom.addTextTinyMce("<h1>Lorem Ipsum</h1><p>${RandomData.STRING_LOREM_IPSUM}</p>")
+        dom.addTextTinyMce(html)
         savePage()
     }
 
@@ -286,6 +337,7 @@ class WebConfluence(
         if (!pluginLicense.isEmpty() && !pluginKey.isEmpty()) {
             val rowSelector = ".upm-plugin[data-key='$pluginKey']"
             val licenseSelector = "$rowSelector textarea.edit-license-key"
+            dom.awaitElementClickable(licenseSelector)
             dom.click("#upm-plugin-status-dialog .cancel")
             dom.insertText(licenseSelector, pluginLicense)
             dom.awaitSeconds(5) // TODO
@@ -360,6 +412,45 @@ class WebConfluence(
             dom.click(selector)
         }
         dom.click(".primary-button-container input[type='submit']")
+    }
+
+    fun insertMacroBody(macroId: String, htmlBody: String) {
+        dom.insertHtmlInEditor(".wysiwyg-macro[data-macro-name='$macroId']", htmlBody)
+    }
+
+    fun actionBuilder(): Actions {
+        return Actions(driver)
+    }
+
+    fun simulateBulletList(bulletPoints: Array<String>) {
+        val actions = Actions(driver)
+        bulletPoints.forEach {
+            actions.sendKeys(it).sendKeys(Keys.RETURN)
+        }
+        actions.perform()
+    }
+
+    fun simulateText(text: String) {
+        Actions(driver).sendKeys(text).perform()
+    }
+
+    fun focusEditor() {
+        driver.switchTo().frame("wysiwygTextarea_ifr")
+        dom.click("#tinymce")
+        driver.switchTo().parentFrame()
+    }
+
+    fun setTwoColumnLayout() {
+        dom.click("#page-layout-2")
+        dom.click("#pagelayout2-toolbar > button:nth-child(2)")
+    }
+
+    fun goToDashboard() {
+        navigateTo("dashboard.action")
+    }
+
+    fun clearEditorContent() {
+        dom.insertTextTinyMce("")
     }
 
 }

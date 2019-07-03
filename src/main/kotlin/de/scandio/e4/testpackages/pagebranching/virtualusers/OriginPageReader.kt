@@ -25,7 +25,7 @@ import de.scandio.e4.worker.interfaces.WebClient
  *
  * @author Felix Grund
  */
-open class OriginPageReader : VirtualUser {
+open class OriginPageReader : VirtualUser() {
 
     override fun getActions(): ActionCollection {
         val actions = ActionCollection()

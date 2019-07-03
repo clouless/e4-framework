@@ -1,6 +1,7 @@
 package de.scandio.e4.setup
 
 import de.scandio.e4.BaseSeleniumTest
+import de.scandio.e4.testpackages.livelytheme.LivelyThemeTestPackage
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -27,28 +28,26 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
     fun test() {
         try {
             setupDatabase()
-            dom.awaitMinutes(4)
             pollTillDbReady()
             webConfluence.takeScreenshot("db-ready")
             postDbSetup()
-            refreshWebClient(true, true)
 
             /* Step 9: Admin config */
-            webConfluence.disableMarketplaceConnectivity()
             refreshWebClient(true, true)
             webConfluence.disableSecureAdminSessions()
-            refreshWebClient(true, true)
+            refreshWebClient(true)
+            webConfluence.disableMarketplaceConnectivity()
+            refreshWebClient(true)
             webConfluence.disableCaptchas()
-            refreshWebClient(true, true)
+            refreshWebClient(true)
             webConfluence.setLogLevel("co.goodsoftware", "INFO")
-            refreshWebClient(true, true)
+            refreshWebClient(true)
             webConfluence.disablePlugin("com.atlassian.troubleshooting.plugin-confluence")
-            refreshWebClient(true, true)
+            refreshWebClient(true)
             webConfluence.disablePlugin("com.atlassian.plugins.base-hipchat-integration-plugin")
-            refreshWebClient(true, true)
-            webConfluence.installPlugin("data-generator", "LATEST")
+            refreshWebClient(true)
+            webConfluence.disablePlugin("com.atlassian.confluence.plugins.confluence-onboarding")
 
-            refreshWebClient(true, true)
         } catch (e: Exception) {
             shot()
             dump()
@@ -95,8 +94,6 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
         dom.awaitElementVisible("#setupdb-successMessage") // not sure if this is working
         dom.click("#setup-next-button")
 
-        /* This takes a few minutes! Make sure the next step has a wait value! */
-        log.info("Database setup in progress. This takes a while. Grab some coffee... :)")
         shot()
     }
 
@@ -118,10 +115,11 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
 
 
         dom.click(".setup-success-button .aui-button-primary.finishAction")
+        dom.awaitSeconds(10)
 
         dom.insertText("#grow-intro-space-name", "TEST")
         dom.click("#grow-intro-create-space")
-        dom.awaitSeconds(10)
+        dom.awaitSeconds(20)
         webConfluence.navigateTo("logout.action")
 
         shot()
@@ -138,8 +136,8 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
                 log.info("+++++++++++++++++++++++++++++++++++++++++!")
                 log.info("+++++++++++ Done with DB Setup ++++++++++!")
                 log.info("+++++++++++++++++++++++++++++++++++++++++!")
-                log.info("But waiting for another safety minute because the setup wizard is buggy...")
-                dom.awaitMinutes(1)
+//                log.info("But waiting for another safety minute because the setup wizard is buggy...")
+//                dom.awaitMinutes(1)
                 break
             }
 

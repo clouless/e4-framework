@@ -95,10 +95,7 @@ public class TestRunnerService {
 		for (Thread virtualUserThread : virtualUserThreads) {
 			virtualUserThread.join();
 		}
-		log.info("All tests are finished! Your database is at {{}}. It has a table {{}} with the results and a table {{}} with errors",
-				storageService.getDatabaseFilePath(),
-				StorageService.TABLE_NAME_MEASUREMENT,
-				StorageService.TABLE_NAME_ERROR);
+		log.info("All tests are finished! Your database is at {{}}", storageService.getDatabaseFilePath());
 
 		applicationStatusService.setTestsStatus(TestsStatus.FINISHED);
 	}
@@ -118,9 +115,16 @@ public class TestRunnerService {
 
 		final Thread virtualUserThread = new Thread(() -> {
 			try {
-				final UserCredentials randomUser = userCredentialsService.getRandomUser();
-				final String username = randomUser.getUsername();
-				final String password = randomUser.getPassword();
+				String username;
+				String password;
+				if (virtualUser.isAdminRequired()) {
+					username = config.getUsername();
+					password = config.getPassword();
+				} else {
+					final UserCredentials randomUser = userCredentialsService.getRandomUser();
+					username = randomUser.getUsername();
+					password = randomUser.getPassword();
+				}
 
 				log.info("Executing virtual user {{}} with actual user {{}}", virtualUser.getClass().getSimpleName(), username);
 
@@ -170,7 +174,7 @@ public class TestRunnerService {
 			String actionClass = action.getClass().getSimpleName();
 			String testpackageClass = testPackage.getClass().getSimpleName();
 			WebClient webClient = null;
-			RestClient restClient = null;
+			RestClient restClient;
 			try {
 				long workerTimeRunning = new Date().getTime() - threadStartTime;
 				if (workerTimeRunning > durationInSeconds * 1000) {
@@ -201,7 +205,7 @@ public class TestRunnerService {
 						virtualUser.getClass().getSimpleName(),
 						action.getClass().getSimpleName());
 				storageService.recordError(e4error);
-				webClient.takeScreenshot("failed-scenario");
+//				webClient.takeScreenshot("failed-scenario");
 			} finally {
 				if (webClient != null) {
 					webClient.quit();

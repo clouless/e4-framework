@@ -3,6 +3,7 @@ package de.scandio.e4.worker.services;
 import de.scandio.e4.client.config.WorkerConfig;
 import de.scandio.e4.dto.PreparationStatus;
 import de.scandio.e4.dto.TestsStatus;
+import de.scandio.e4.worker.client.NoopWebClient;
 import de.scandio.e4.worker.collections.ActionCollection;
 import de.scandio.e4.worker.confluence.rest.RestConfluence;
 import de.scandio.e4.worker.interfaces.Action;
@@ -58,15 +59,22 @@ public class PreparationService {
 
         try {
             List<String> usernames = restConfluence.getConfluenceUsers();
-            List<UserCredentials> userCredentials = new ArrayList<>();
-            for (String username : usernames) {
-                if (!username.equals(config.getUsername())) {
-                    userCredentials.add(new UserCredentials(username, DEFAULT_USER_PASSWORD));
-                }
-            }
-            userCredentialsService.storeUsers(userCredentials);
+			List<UserCredentials> userCredentials = new ArrayList<>();
+			for (String username : usernames) {
+				if (!username.equals(config.getUsername())) {
+					userCredentials.add(new UserCredentials(username, DEFAULT_USER_PASSWORD));
+				}
+			}
+			userCredentialsService.storeUsers(userCredentials);
             if (!setupScenarios.isEmpty()) {
-				final WebClient webClient = WorkerUtils.newChromeWebClientPreparePhase(config.getTarget(), applicationStatusService.getInputDir(), applicationStatusService.getOutputDir(), config.getUsername(), config.getPassword());
+				WebClient webClient;
+//            	if (!setupScenarios.allRestOnly()) {
+//					webClient = new NoopWebClient();
+//				} else {
+					webClient = WorkerUtils.newChromeWebClient(
+							config.getTarget(), applicationStatusService.getInputDir(),
+							applicationStatusService.getOutputDir(), config.getUsername(), config.getPassword());
+//				}
 				try {
 					for (Action action : setupScenarios) {
 						try {
@@ -74,8 +82,10 @@ public class PreparationService {
 							action.execute(webClient, restConfluence);
 						} catch (Exception e) {
 							log.error("Failed executing action {{}}", action.getClass().getSimpleName());
-							webClient.takeScreenshot("failed-action");
-							webClient.dumpHtml("failed-action");
+							if (!action.isRestOnly()) {
+								webClient.takeScreenshot("failed-action");
+								webClient.dumpHtml("failed-action");
+							}
 							throw e;
 						}
 
