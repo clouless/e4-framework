@@ -76,6 +76,7 @@ class DomHelper(
     }
 
     fun awaitElementPresent(selector: String, duration: Long = this.defaultDuration) {
+        log.debug("Waiting for element {{}} to be present for {{}} seconds", duration, selector)
         wait(ExpectedConditions.presenceOfElementLocated(By.cssSelector(selector)), duration)
     }
 
@@ -146,6 +147,7 @@ class DomHelper(
     }
 
     fun click(selector: String, awaitClickableSeconds: Long = this.defaultWaitTillPresent) {
+        log.debug("Click {{}} wait {{}}sec", selector, awaitClickableSeconds)
         if (this.screenshotBeforeClick) {
             val safeSelector = URLEncoder.encode("$selector", "UTF-8")
             this.util.takeScreenshot(driver, "$outDir/click-$safeSelector.png")

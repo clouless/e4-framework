@@ -1,6 +1,7 @@
 package de.scandio.e4.rest
 
-import de.scandio.e4.worker.confluence.rest.RestConfluence
+import de.scandio.e4.E4
+import de.scandio.e4.worker.rest.RestConfluence
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -23,12 +24,7 @@ class TestFindPages {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    private val BASE_URL = "http://e4-test:8090/"
-    private val OUT_DIR = "/tmp/e4/out"
-    private val USERNAME = "admin"
-    private val PASSWORD = "admin"
-
-    private val restConfluence = RestConfluence(BASE_URL, USERNAME, PASSWORD)
+    private val restConfluence = RestConfluence(E4.ADMIN_USERNAME, E4.ADMIN_PASSWORD)
 
 
     @Before

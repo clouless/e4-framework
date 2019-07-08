@@ -1,7 +1,9 @@
 package de.scandio.e4.it.pqconf
 
 import de.scandio.e4.BaseSeleniumTest
-import de.scandio.e4.testpackages.pqconf.util.PocketQuerySeleniumHelper
+import de.scandio.e4.clients.WebConfluence
+import de.scandio.e4.testpackages.pocketquery.PocketQuerySeleniumHelper
+import de.scandio.e4.testpackages.pocketquery.pqconf.PocketQueryConfluenceSeleniumHelper
 import org.junit.After
 import org.junit.Test
 import java.util.*
@@ -10,6 +12,7 @@ class PocketQuerySeleniumTestSuite : BaseSeleniumTest() {
 
     @Test // 3.9.3
     fun testRenderPocketQueryMacro() {
+        val webConfluence = webClient() as WebConfluence
         try {
             val wikipediaTitle = "Vancouver"
             val wikipediaUrl = "https://en.wikipedia.org/w/api.php"
@@ -26,7 +29,7 @@ class PocketQuerySeleniumTestSuite : BaseSeleniumTest() {
                     ${'$'}result.get(0).wikipediaContent
             """.trimIndent().trimLines()
 
-            val pqHelper = PocketQuerySeleniumHelper(webConfluence, webConfluence.dom)
+            val pqHelper = PocketQueryConfluenceSeleniumHelper(webConfluence, webConfluence.dom)
             webConfluence.login()
             pqHelper.goToPocketQueryAdmin()
             val wikipediaDatasourceName = pqHelper.createRestCustomDatasource("WikipediaDS", wikipediaUrl)
@@ -63,7 +66,7 @@ class PocketQuerySeleniumTestSuite : BaseSeleniumTest() {
 
     @After
     fun after() {
-        webConfluence.quit()
+        webClient().quit()
     }
 
     fun String.trimLines() = replace("\n", "")

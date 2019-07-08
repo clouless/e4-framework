@@ -1,17 +1,18 @@
 package de.scandio.e4.worker.services;
 
+import de.scandio.e4.E4;
 import de.scandio.e4.client.config.WorkerConfig;
 import de.scandio.e4.dto.PreparationStatus;
 import de.scandio.e4.dto.TestsStatus;
-import de.scandio.e4.worker.client.NoopWebClient;
 import de.scandio.e4.worker.collections.ActionCollection;
-import de.scandio.e4.worker.confluence.rest.RestConfluence;
+import de.scandio.e4.worker.factories.ClientFactory;
+import de.scandio.e4.worker.interfaces.RestClient;
+import de.scandio.e4.worker.rest.RestConfluence;
 import de.scandio.e4.worker.interfaces.Action;
 import de.scandio.e4.worker.interfaces.TestPackage;
 import de.scandio.e4.worker.interfaces.WebClient;
 import de.scandio.e4.worker.util.UserCredentials;
 import de.scandio.e4.worker.util.WorkerUtils;
-import org.openqa.selenium.Dimension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -55,10 +56,10 @@ public class PreparationService {
         final TestPackage testPackageInstance = testPackage.newInstance();
 
         final ActionCollection setupScenarios = testPackageInstance.getSetupActions();
-        final RestConfluence restConfluence = (RestConfluence) WorkerUtils.newRestClient(config.getTarget(), config.getUsername(), config.getPassword());
+        final RestClient restClient = ClientFactory.newRestClient(config.getUsername(), config.getPassword());
 
         try {
-            List<String> usernames = restConfluence.getConfluenceUsers();
+            List<String> usernames = restClient.getUsernames();
 			List<UserCredentials> userCredentials = new ArrayList<>();
 			for (String username : usernames) {
 				if (!username.equals(config.getUsername())) {
@@ -71,15 +72,13 @@ public class PreparationService {
 //            	if (!setupScenarios.allRestOnly()) {
 //					webClient = new NoopWebClient();
 //				} else {
-					webClient = WorkerUtils.newChromeWebClient(
-							config.getTarget(), applicationStatusService.getInputDir(),
-							applicationStatusService.getOutputDir(), config.getUsername(), config.getPassword());
+					webClient = ClientFactory.newChromeWebClient(config.getUsername(), config.getPassword());
 //				}
 				try {
 					for (Action action : setupScenarios) {
 						try {
 							log.info("Executing action {{}}", action.getClass().getSimpleName());
-							action.execute(webClient, restConfluence);
+							action.execute(webClient, restClient);
 						} catch (Exception e) {
 							log.error("Failed executing action {{}}", action.getClass().getSimpleName());
 							if (!action.isRestOnly()) {
