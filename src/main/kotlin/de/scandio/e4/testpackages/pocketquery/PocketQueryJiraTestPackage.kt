@@ -25,7 +25,9 @@ class PocketQueryJiraTestPackage: TestPackage {
     override fun getSetupActions(): ActionCollection {
         val actions = ActionCollection()
 //        actions.add(InstallPluginAction("pocketquery-jira", "1.3.1", APP_LICENSE, "de.scandio.jira.plugins.pocketquery-jira"))
-        actions.add(PocketQueryJiraSetupAction())
+        //actions.add(PocketQueryJiraSetupAction()) // TODO look at this
+        // add create project
+        // add pq settings in project
         return actions
     }
 

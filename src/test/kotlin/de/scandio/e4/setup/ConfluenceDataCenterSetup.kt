@@ -3,7 +3,6 @@ package de.scandio.e4.setup
 import de.scandio.e4.BaseSeleniumTest
 import de.scandio.e4.E4
 import de.scandio.e4.clients.WebConfluence
-import de.scandio.e4.testpackages.livelytheme.LivelyThemeTestPackage
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -65,7 +64,7 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
     }
 
     fun setupDatabase() {
-        driver.navigate().to(E4.WEB_BASE_URL) // TODO use webConfluence.navigateTo
+        driver.navigate().to(E4.APPLICATION_BASE_URL) // TODO use webConfluence.navigateTo
         dom.awaitSeconds(3) // just wait a bit for safety
 
         /* Step 1: Test vs. Production */
@@ -137,7 +136,7 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
         var pollCount = 1
         while (true) {
             refreshWebClient(false, false)
-            driver.navigate().to(E4.WEB_BASE_URL)
+            driver.navigate().to(E4.APPLICATION_BASE_URL)
             dom.awaitSeconds(10)
             if (dom.isElementPresent("form[action='setupdata.action']")) {
                 log.info("+++++++++++++++++++++++++++++++++++++++++!")

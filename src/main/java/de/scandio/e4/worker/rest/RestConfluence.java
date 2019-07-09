@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RestConfluence implements RestClient {
+public class RestConfluence extends RestAtlassian {
 
 	private static final Logger log = LoggerFactory.getLogger(RestConfluence.class);
 
@@ -28,14 +28,8 @@ public class RestConfluence implements RestClient {
 
 	private Map<String, Long> contentIds = new HashMap<>();
 
-	private String username;
-	private String password;
-	private String baseUrl;
-
 	public RestConfluence(String username, String password) {
-		this.baseUrl = E4.REST_BASE_URL;
-		this.username = username;
-		this.password = password;
+		super(username, password);
 	}
 
 	public String findPage(String spaceKey, String title) {
@@ -146,91 +140,6 @@ public class RestConfluence implements RestClient {
 		String bodyTemplate = "{\"key\":\"%s\",\"name\":\"%s\",\"description\":{\"plain\":{\"value\":\"%s\",\"representation\":\"plain\"}},\"metadata\":{}}";
 		String body = String.format(bodyTemplate, spaceKey, spaceName, spaceDesc);
 		return sendPostRequest("rest/api/space/", body);
-	}
-
-	private List<Map> getResultListFromResponse(String responseText) {
-		Map<String, Object> response = GSON.fromJson(responseText, Map.class);
-		List<Map> pageObjects = (ArrayList) response.get("results");
-		return pageObjects;
-	}
-
-	private String sendPutRequest(String urlAfterBaseUrl, String body) {
-		return sendPostOrPutRequest(HttpMethod.PUT, urlAfterBaseUrl, body);
-	}
-
-	private String sendPostRequest(String urlAfterBaseUrl, String body) {
-		return sendPostOrPutRequest(HttpMethod.POST, urlAfterBaseUrl, body);
-	}
-
-	private String sendPostOrPutRequest(HttpMethod method, String urlAfterBaseUrl, String body) {
-		final String url = this.baseUrl + urlAfterBaseUrl;
-		RestTemplate restTemplate = new RestTemplate(new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()));
-//		List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
-//		interceptors.add(new LoggingRequestInterceptor());
-//		restTemplate.setInterceptors(interceptors);
-
-		log.debug("Sending {{}} request {{}} with body {{}}", method, url, body);
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Authorization", getBasicAuth());
-		headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-
-		HttpEntity<String> request = new HttpEntity<>(body, headers);
-
-		ResponseEntity<String> response;
-		try {
-			response = restTemplate.exchange(url, method, request, String.class);
-		} catch (HttpClientErrorException e) {
-			log.error("Exception sending REST {{}} request for user {{}} with password {{}} and URL {{}}",
-					method, this.username, this.password, url);
-			throw e;
-		}
-		return response.getBody();
-	}
-
-	public int sendGetRequestReturnStatus(String urlAfterBaseUrl) {
-		return sendGetRequestReturnResponse(urlAfterBaseUrl).getStatusCodeValue();
-	}
-
-	public String sendGetRequestReturnBody(String urlAfterBaseUrl) {
-		ResponseEntity<String> response = sendGetRequestReturnResponse(urlAfterBaseUrl);
-		String responseText = response.getBody();
-//		log.debug("Response text {{}}", responseText);
-		return responseText;
-	}
-
-	private ResponseEntity<String> sendGetRequestReturnResponse(String urlAfterBaseUrl) {
-		final String url = this.baseUrl + urlAfterBaseUrl;
-		final RestTemplate restTemplate = new RestTemplate();
-
-		log.debug("Sending GET request {{}}", url);
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Authorization", getBasicAuth());
-
-		HttpEntity<String> request = new HttpEntity<>(headers);
-		ResponseEntity<String> response;
-		try {
-			response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
-		} catch (HttpClientErrorException e) {
-			log.error("Exception sending REST GET request for user {{}} with password {{}} and URL {{}}", this.username, this.password, url);
-			throw e;
-		}
-
-		return response;
-	}
-
-	private String getBasicAuth() {
-		String plainCreds = this.username + ":" + this.password;
-		byte[] plainCredsBytes = plainCreds.getBytes();
-		byte[] base64CredsBytes = Base64.encodeBase64(plainCredsBytes);
-		String base64Creds = new String(base64CredsBytes);
-		return "Basic " + base64Creds;
-	}
-
-	@Override
-	public String getUser() {
-		return this.username;
 	}
 
 }

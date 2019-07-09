@@ -1,6 +1,8 @@
 package de.scandio.e4.testpackages.pocketquery
 
+import de.scandio.e4.clients.WebConfluence
 import de.scandio.e4.helpers.DomHelper
+import de.scandio.e4.testpackages.pocketquery.pqconf.PocketQueryConfluenceSeleniumHelper
 import de.scandio.e4.worker.interfaces.WebClient
 import org.openqa.selenium.JavascriptExecutor
 import java.util.*
@@ -20,7 +22,6 @@ abstract class PocketQuerySeleniumHelper(
             driverString = "com.mysql.jdbc.Driver"
         }
 
-        goToAdminSection("database")
         openAddEntityForm("database")
         val datasourceName = "${name}_${Date().time}"
         insertEntityName("database", datasourceName)
@@ -54,6 +55,8 @@ abstract class PocketQuerySeleniumHelper(
     }
 
     fun createRestQuery(datasourceName: String, name: String, url: String, jsonPath: String): String {
+        goToAdminSection("query")
+        openAddEntityForm("query")
         val queryName = createBaseQuery(datasourceName, name, url)
         dom.insertText("#query-jsonpath", jsonPath)
         submitForm("query", queryName)
@@ -61,6 +64,8 @@ abstract class PocketQuerySeleniumHelper(
     }
 
     fun createSqlQuery(datasourceName: String, name: String, statementOrUrl: String): String {
+        goToAdminSection("query")
+        openAddEntityForm("query")
         val queryName = createBaseQuery(datasourceName, name, statementOrUrl)
         submitForm("query", queryName)
         return queryName
@@ -90,11 +95,13 @@ abstract class PocketQuerySeleniumHelper(
     }
 
     fun openAddEntityForm(entityType: String) {
+        goToAdminSection(entityType)
         dom.click("#pocket-${pluralEntityType(entityType)} .nice-add-entity")
         dom.awaitClass("#pocket-${pluralEntityType(entityType)}", "form-visible")
     }
 
     fun openEditEntityForm(entityType: String, entityName: String) {
+        goToAdminSection(entityType)
         dom.click("#pocket-${pluralEntityType(entityType)} li[data-entityname='$entityName']")
         dom.awaitClass("#pocket-${pluralEntityType(entityType)}", "form-visible")
     }
@@ -194,6 +201,14 @@ abstract class PocketQuerySeleniumHelper(
 
         setTemplateOnQuery(wikipediaQueryName, wikipediaTemplateName)
         setConverterOnQuery(wikipediaQueryName, wikipediaConverterName)
+    }
+
+    fun createSqlSetup(dbName: String, dbUrl: String, dbUser: String, dbPassword: String): String {
+        val confluenceDatasourceName = createSqlDatasource(dbName, dbUrl, dbUser, dbPassword)
+        return createSqlQuery(
+                confluenceDatasourceName,
+                "SelectUsers",
+                "SELECT id, user_name FROM cwd_user")
     }
 
     fun String.trimLines() = replace("\n", "")

@@ -57,7 +57,7 @@ class DomHelper(
         select.selectByValue(value)
     }
 
-    fun executeScript(script: String): Any {
+    fun executeScript(script: String): Any? {
         val js = driver as JavascriptExecutor
         return js.executeScript(script)
     }

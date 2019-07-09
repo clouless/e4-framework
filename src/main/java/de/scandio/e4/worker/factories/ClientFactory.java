@@ -3,7 +3,7 @@ package de.scandio.e4.worker.factories;
 import de.scandio.e4.E4;
 import de.scandio.e4.clients.WebConfluence;
 import de.scandio.e4.clients.WebJira;
-import de.scandio.e4.worker.client.ClientPlatform;
+import de.scandio.e4.worker.client.ApplicationName;
 import de.scandio.e4.worker.interfaces.RestClient;
 import de.scandio.e4.worker.interfaces.WebClient;
 import de.scandio.e4.worker.rest.RestConfluence;
@@ -42,9 +42,9 @@ public class ClientFactory {
 	public static WebClient newChromeWebClient(String username, String password) throws Exception {
 		WebDriver driver = newChromeDriver();
 		driver.manage().window().setSize(new Dimension(2000, 1500));
-		URI uri = new URI(E4.WEB_BASE_URL);
+		URI uri = new URI(E4.APPLICATION_BASE_URL);
 		WebClient webClient;
-		if (E4.APPLICATION_TYPE == ClientPlatform.confluence) {
+		if (E4.APPLICATION_NAME == ApplicationName.confluence) {
 			webClient = new WebConfluence(driver, uri, E4.IN_DIR, E4.OUT_DIR, username, password);
 		} else {
 			webClient = new WebJira(driver, uri, E4.IN_DIR, E4.OUT_DIR, username, password);
@@ -60,7 +60,7 @@ public class ClientFactory {
 //	}
 
 	public static RestClient newRestClient(String username, String password) {
-		if (E4.APPLICATION_TYPE == ClientPlatform.confluence) {
+		if (E4.APPLICATION_NAME == ApplicationName.confluence) {
 			return new RestConfluence(username, password);
 		} else {
 			return new RestJira(username, password);

@@ -1,41 +1,41 @@
 package de.scandio.e4;
 
-import de.scandio.e4.worker.client.ClientPlatform;
+import de.scandio.e4.worker.client.ApplicationName;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 public class E4 {
 
-	private static final String[] REQUIRED_VARS = {
-			"E4_APPLICATION_TYPE", "E4_WEB_BASE_URL", "E4_REST_BASE_URL", "E4_OUT_DIR", "E4_IN_DIR", "E4_ADMIN_USER",
-			"E4_ADMIN_PWD"
-	};
-
-	static {
-		for (String requiredVar : REQUIRED_VARS) {
-			if (StringUtils.isBlank(System.getenv(requiredVar))) {
-				throw new IllegalArgumentException("Not all required environment variables are " +
-						"provided. Missing '"+requiredVar+ "'. " +
-						"\nAll required vars:\n"+StringUtils.join(REQUIRED_VARS, "\n"));
-			}
-		}
-	}
-
 	// BEGIN: REQUIRED
-	public static final ClientPlatform APPLICATION_TYPE = ClientPlatform.valueOf(System.getenv("E4_APPLICATION_TYPE"));
-	public static final String WEB_BASE_URL = resolveBaseUrl("E4_WEB_BASE_URL");
-	public static final String REST_BASE_URL = resolveBaseUrl("E4_REST_BASE_URL");
-	public static final String OUT_DIR = System.getenv("E4_OUT_DIR");
-	public static final String IN_DIR = System.getenv("E4_IN_DIR");
-	public static final String ADMIN_USERNAME = System.getenv("E4_ADMIN_USER");
-	public static final String ADMIN_PASSWORD = System.getenv("E4_ADMIN_PWD");
+	public static final ApplicationName APPLICATION_NAME = ApplicationName.valueOf(getenv("E4_APPLICATION_NAME"));
+	public static final String APPLICATION_BASE_URL = resolveBaseUrl("E4_APPLICATION_BASE_URL");
+	public static final String OUT_DIR = getenv("E4_OUT_DIR");
+	public static final String IN_DIR = getenv("E4_IN_DIR");
+	public static final String ADMIN_USERNAME = getenv("E4_ADMIN_USER");
+	public static final String ADMIN_PASSWORD = getenv("E4_ADMIN_PWD");
+	public static final String APPLICATION_VERSION = getenv("E4_APPLICATION_VERSION");
+	public static final String APPLICATION_VERSION_DOT_FREE = APPLICATION_VERSION.replace(".", "");
 	// END: REQUIRED
 
-	public static final String APPLICATION_LICENSE = System.getenv("E4_APPLICATION_LICENSE");
-	public static final boolean PREPARATION_RUN = "true".equals(System.getenv("E4_PREPARATION_RUM"));
+	public static final String APPLICATION_LICENSE = getenv("E4_APPLICATION_LICENSE", false);
+	public static final boolean PREPARATION_RUN = "true".equals(getenv("E4_PREPARATION_RUM", false));
+	public static final String APP_VERSION = getenv("E4_APP_VERSION", false);
+	public static final String APP_LICENSE = getenv("E4_APP_LICENSE", false);
 
 	private static String resolveBaseUrl(String varName) {
-		String url = System.getenv(varName);
+		String url = getenv(varName);
 		return url.endsWith("/") ? url : url + "/";
 	}
 
+	public static String getenv(String envVarKey, boolean required) throws IllegalArgumentException {
+		String envVarValue = System.getenv(envVarKey);
+		if (required && StringUtils.isBlank(envVarValue)) {
+			throw new IllegalArgumentException("Environment variable needs to be set: " + envVarKey);
+		}
+		return envVarValue;
+	}
+
+	private static String getenv(String envVarKey) {
+		return getenv(envVarKey, true);
+	}
 }
