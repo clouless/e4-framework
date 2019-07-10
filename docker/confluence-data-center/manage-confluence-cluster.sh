@@ -113,7 +113,7 @@ function start_instance_database {
         --net-alias=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-db \
         --env POSTGRES_PASSWORD=confluence \
         --env POSTGRES_USER=confluence \
-        --env CONFLUENCE_VERSION=$CONFLUENCE_VERSION \
+        --env E4_PROV_KEY=$E4_PROV_KEY \
         -v $(pwd)/postgres:/docker-entrypoint-initdb.d \
         -v $E4_PROV_DIR:/e4prov \
         -d postgres:${POSTGRESQL_VERSION} -c max_connections=300 -c shared_buffers=80MB
