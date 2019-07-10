@@ -116,7 +116,7 @@ function start_instance_database {
         --env E4_PROV_KEY=$E4_PROV_KEY \
         -v $(pwd)/postgres:/docker-entrypoint-initdb.d \
         -v $E4_PROV_DIR:/e4prov \
-        -d postgres:${POSTGRESQL_VERSION} -c max_connections=300 -c shared_buffers=80MB
+        -d postgres:${POSTGRESQL_VERSION} -c max_connections=300 -c shared_buffers=80MB -c checkpoint_timeout=5min -c wal_level=minimal -c autovacuum=off
 }
 
 function start_instance_loadbalancer {
@@ -141,11 +141,11 @@ function start_instance_confluencenode {
         --net=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE} \
         --net-alias=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-node${1} \
         --env NODE_NUMBER=${1} \
-        --env CONFLUENCE_VERSION=$CONFLUENCE_VERSION \
+        --env E4_PROV_KEY=$E4_PROV_KEY \
         --env E4_PROV_DIR=$E4_PROV_DIR \
         -v confluence-shared-home-${CONFLUENCE_VERSION_DOT_FREE}:/confluence-shared-home \
-        -p 5005:5005 \
-        -p 4330:4330 \
+        -p "500$1:500$1" \
+        -p "433$1:433$1" \
         -v $(pwd)/confluencenode:/e4work \
         -v $E4_PROV_DIR:/e4prov \
         --entrypoint /e4work/docker-entrypoint.sh \
@@ -451,8 +451,8 @@ then
     start_instance_loadbalancer $SCALE
     echo ""
 
-    echo ">>> Waiting for 10sec for database and loadbalancer"
-    sleep 10
+    echo ">>> Waiting for 30sec for database and loadbalancer"
+    sleep 30
 
     for (( node_id=1; node_id<=$SCALE; node_id++ ))
     do
