@@ -5,7 +5,7 @@ set -e
 umask u+rxw,g+rwx,o-rwx
 
 # BEGIN: EDIT
-# Given by --env: $CONFLUENCE_VERSION, $NODE_NUMBER
+# Given by --env: $E4_PROV_KEY, $CONFLUENCE_VERSION
 CONFLUENCE_VERSION_DOT_FREE=${CONFLUENCE_VERSION//\./}
 # END: EDIT
 
@@ -86,7 +86,7 @@ else
   #
   echo ">> docker-entrypoint: starting confluence home sync server on port 8888"
   #BEGIN: edit
-  if [[ -d /e4prov/conf${CONFLUENCE_VERSION_DOT_FREE} ]];
+  if [[ -d /e4prov/$E4_PROV_KEY ]];
   then
       echo ">>> docker-entrypoint: provisioning home dir for $E4_PROV_KEY"
       cp -r /e4prov/$E4_PROV_KEY/confluence-home/* /confluence-home/
