@@ -29,8 +29,6 @@ MANAGEMENT_SCRIPT_VERSION=3
 #CONFLUENCE_VERSION_DOT_FREE="6153"
 #CONFLUENCE_LB_PUBLIC_PORT=$(expr "2${CONFLUENCE_VERSION_DOT_FREE}")
 
-E4_PROVISION_BASE_URL="https://cloud.scandio.de/s/9QMZWYdLSHfr5Gw/"
-
 if [[ ("$ACTION" == "create" || "$ACTION" == "update") && ! $E4_PROV_DIR ]]
 then
     echo -e $C_RED">>> config error ........: environment variable E4_PROV_DIR must be set to a directory for provisioning"$C_RST
@@ -156,25 +154,25 @@ function start_instance_confluencenode {
 
 function download_synchrony {
     echo ">>> Download synchrony jar"
-    mkdir -p $E4_PROV_DIR/conf$CONFLUENCE_VERSION_DOT_FREE
-    curl "$E4_PROVISION_BASE_URL/download?path=%2F&files=synchrony-standalone.jar" --output $E4_PROV_DIR/synchrony-standalone.jar
+    mkdir -p "$E4_PROV_DIR/$E4_PROV_KEY"
+    aws s3 cp s3://e4prov/synchrony-standalone.jar $E4_PROV_DIR/
 }
 
 function download_confluence {
-    targetTarGzName="conf$CONFLUENCE_VERSION_DOT_FREE"
-    provUrl="$E4_PROVISION_BASE_URL/download?path=%2F&files=$targetTarGzName.tar.gz"
-    curl $provUrl --output $E4_PROV_DIR/$targetTarGzName.tar.gz
-    if [ $(du -k "$E4_PROV_DIR/$targetTarGzName.tar.gz" | cut -f1) -gt 100 ]
+    echo ">>> Attempting to download: aws s3 cp s3://e4prov/$E4_PROV_KEY.tar.gz $E4_PROV_DIR/"
+    aws s3 cp "s3://e4prov/$E4_PROV_KEY.tar.gz" $E4_PROV_DIR/
+    if [ $(du -k "$E4_PROV_DIR/$E4_PROV_KEY.tar.gz" | cut -f1) -gt 100 ]
     then
-        mkdir -p $E4_PROV_DIR/$targetTarGzName
-        echo ">>> Output file: $E4_PROV_DIR/$targetTarGzName.tar.gz"
+        mkdir -p $E4_PROV_DIR/$E4_PROV_KEY
+        echo ">>> Output file: $E4_PROV_DIR/$E4_PROV_KEY.tar.gz"
         echo ">>> Extracting archive"
-        tar xf $E4_PROV_DIR/$targetTarGzName.tar.gz -C $E4_PROV_DIR
-        cp $E4_PROV_DIR/synchrony-standalone.jar $E4_PROV_DIR/$targetTarGzName/synchrony-standalone.jar
+        tar xf $E4_PROV_DIR/$E4_PROV_KEY.tar.gz -C $E4_PROV_DIR
+        cp $E4_PROV_DIR/synchrony-standalone.jar $E4_PROV_DIR/$E4_PROV_KEY/synchrony-standalone.jar
     else
         echo ">> WARN ........: Provision file not found. Starting empty."
+        sleep 5
     fi
-    rm $E4_PROV_DIR/$targetTarGzName.tar.gz
+    rm $E4_PROV_DIR/$E4_PROV_KEY.tar.gz
 }
 
 # Kill the database instance
@@ -331,6 +329,10 @@ case $key in
     CONFLUENCE_LB_PUBLIC_PORT=$(expr "2${CONFLUENCE_VERSION_DOT_FREE}")
     shift
     ;;
+    -k|--provkey)
+    E4_PROV_KEY="$2"
+    shift
+    ;;
     *)
        # unknown option
     ;;
@@ -364,6 +366,12 @@ else
     if [[ ! $CONFLUENCE_VERSION ]]
     then
         echo -e $C_RED">> param error ........: Please specify version as parameter -v or --version. E.g. --version 6.15.3"$C_RST
+        EXIT=1
+    fi
+
+    if [[ "$ACTION" == "create" && ! $E4_PROV_KEY ]]
+    then
+        echo -e $C_RED">> param error ........: Please specify E4 provisioning key -k or --provkey. E.g. --provkey conf6153_large"$C_RST
         EXIT=1
     fi
 
@@ -408,12 +416,12 @@ then
       download_synchrony
     fi
 
-    if [[ ! -d $E4_PROV_DIR/conf$CONFLUENCE_VERSION_DOT_FREE ]];
+    if [[ ! -d $E4_PROV_DIR/$E4_PROV_KEY ]];
     then
-      echo ">> Download provisioning set for Confluence $CONFLUENCE_VERSION"
-      download_confluence $CONFLUENCE_VERSION_DOT_FREE
+      echo ">> Download provisioning set for Confluence $CONFLUENCE_VERSION with key $E4_PROV_KEY"
+      download_confluence $E4_PROV_KEY
     else
-      echo ">> Provision resources found for Confluence $CONFLUENCE_VERSION"
+      echo ">> Provision resources found for Confluence $CONFLUENCE_VERSION with key $E4_PROV_KEY"
     fi
     # END: edit
 
