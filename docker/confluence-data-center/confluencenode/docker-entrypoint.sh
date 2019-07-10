@@ -88,9 +88,9 @@ else
   #BEGIN: edit
   if [[ -d /e4prov/conf${CONFLUENCE_VERSION_DOT_FREE} ]];
   then
-      echo ">>> docker-entrypoint: provisioning home dir for ${CONFLUENCE_VERSION_DOT_FREE}"
-      cp -r /e4prov/conf${CONFLUENCE_VERSION_DOT_FREE}/confluence-home/* /confluence-home/
-      cp -r /e4prov/conf${CONFLUENCE_VERSION_DOT_FREE}/confluence-shared-home/* /confluence-shared-home/
+      echo ">>> docker-entrypoint: provisioning home dir for $E4_PROV_KEY"
+      cp -r /e4prov/$E4_PROV_KEY/confluence-home/* /confluence-home/
+      cp -r /e4prov/$E4_PROV_KEY/confluence-shared-home/* /confluence-shared-home/
   else
      echo ">>> No provision dir found. Starting from scratch."
   fi
