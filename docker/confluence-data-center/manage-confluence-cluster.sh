@@ -164,6 +164,7 @@ function download_confluence {
     then
         echo ">> Provision file found"
         mkdir -p $E4_PROV_DIR/$E4_PROV_KEY
+        aws s3 cp s3://e4prov/$E4_PROV_KEY.tar.gz $E4_PROV_DIR/
         echo ">>> Output file: $E4_PROV_DIR/$E4_PROV_KEY.tar.gz"
         echo ">>> Extracting archive"
         tar xf $E4_PROV_DIR/$E4_PROV_KEY.tar.gz -C $E4_PROV_DIR
