@@ -149,7 +149,7 @@ function start_instance_confluencenode {
         -v $(pwd)/confluencenode:/e4work \
         -v $E4_PROV_DIR:/e4prov \
         --entrypoint /e4work/docker-entrypoint.sh \
-        -d codeclou/docker-atlassian-confluence-data-center:confluencenode-${CONFLUENCE_VERSION}
+        -it codeclou/docker-atlassian-confluence-data-center:confluencenode-${CONFLUENCE_VERSION}
 }
 
 function download_synchrony {
