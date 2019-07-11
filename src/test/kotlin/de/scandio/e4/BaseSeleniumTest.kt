@@ -57,7 +57,7 @@ open abstract class BaseSeleniumTest {
     }
 
     open fun refreshWebClient(login: Boolean = false, authenticate: Boolean = false) {
-        webClient().quit()
+//        webClient().quit()
 
         WebDriverManager.chromedriver().setup()
         val chromeOptions = ChromeOptions()

@@ -160,19 +160,19 @@ function download_synchrony {
 
 function download_confluence {
     echo ">>> Attempting to download: aws s3 cp s3://e4prov/$E4_PROV_KEY.tar.gz $E4_PROV_DIR/"
-    aws s3 cp "s3://e4prov/$E4_PROV_KEY.tar.gz" $E4_PROV_DIR/
-    if [ $(du -k "$E4_PROV_DIR/$E4_PROV_KEY.tar.gz" | cut -f1) -gt 100 ]
+    if aws s3 ls "s3://e4prov" | grep "$E4_PROV_KEY.tar.gz" > /dev/null
     then
+        echo ">> Provision file found"
         mkdir -p $E4_PROV_DIR/$E4_PROV_KEY
         echo ">>> Output file: $E4_PROV_DIR/$E4_PROV_KEY.tar.gz"
         echo ">>> Extracting archive"
         tar xf $E4_PROV_DIR/$E4_PROV_KEY.tar.gz -C $E4_PROV_DIR
         cp $E4_PROV_DIR/synchrony-standalone.jar $E4_PROV_DIR/$E4_PROV_KEY/synchrony-standalone.jar
+        rm $E4_PROV_DIR/$E4_PROV_KEY.tar.gz
     else
         echo ">> WARN ........: Provision file not found. Starting empty."
-        sleep 5
+        sleep 3
     fi
-    rm $E4_PROV_DIR/$E4_PROV_KEY.tar.gz
 }
 
 # Kill the database instance
@@ -451,8 +451,8 @@ then
     start_instance_loadbalancer $SCALE
     echo ""
 
-    echo ">>> Waiting for 30sec for database and loadbalancer"
-    sleep 30
+    echo ">>> Waiting for 20sec for database and loadbalancer"
+    sleep 20
 
     for (( node_id=1; node_id<=$SCALE; node_id++ ))
     do
