@@ -1,9 +1,8 @@
 package de.scandio.e4.testpackages.pocketquery
 
-import de.scandio.e4.E4
+import de.scandio.e4.E4TestEnv
 import de.scandio.e4.testpackages.TestPackageTestRun
 import de.scandio.e4.testpackages.pocketquery.pqconf.PocketQueryJiraTestPackage
-import de.scandio.e4.worker.interfaces.TestPackage
 import org.junit.Before
 import org.junit.Test
 
@@ -18,7 +17,7 @@ class PocketQueryJiraTestRun : TestPackageTestRun() {
 
     @Test
     fun runTest() {
-        if (E4.PREPARATION_RUN) {
+        if (E4TestEnv.PREPARATION_RUN) {
             executeTestPackagePrepare(TEST_PACKAGE)
         } else {
 //            executeTestPackage(TEST_PACKAGE)

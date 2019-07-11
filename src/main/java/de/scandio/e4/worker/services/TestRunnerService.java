@@ -1,6 +1,5 @@
 package de.scandio.e4.worker.services;
 
-import de.scandio.e4.E4;
 import de.scandio.e4.client.config.WorkerConfig;
 import de.scandio.e4.worker.factories.ClientFactory;
 import de.scandio.e4.worker.model.E4Error;
@@ -184,8 +183,9 @@ public class TestRunnerService {
 					break;
 				}
 				log.debug("Executing action {{}}", action.getClass().getSimpleName());
-				webClient = ClientFactory.newChromeWebClient(username, password);
-				restClient = ClientFactory.newRestClient(username, password);
+				webClient = ClientFactory.newChromeWebClient(testPackage.getApplicationName(), targetUrl, applicationStatusService.getInputDir(),
+						applicationStatusService.getOutputDir(), username, password);
+				restClient = ClientFactory.newRestClient(testPackage.getApplicationName(), targetUrl, username, password);
 				action.executeWithRandomDelay(webClient, restClient);
 //				webClient.takeScreenshot("afteraction-" + action.getClass().getSimpleName());
 //				webClient.dumpHtml("afteraction-" + action.getClass().getSimpleName());

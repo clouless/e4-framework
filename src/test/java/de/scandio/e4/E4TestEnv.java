@@ -1,10 +1,13 @@
 package de.scandio.e4;
 
 import de.scandio.e4.worker.client.ApplicationName;
+import de.scandio.e4.worker.factories.ClientFactory;
+import de.scandio.e4.worker.interfaces.RestClient;
+import de.scandio.e4.worker.interfaces.WebClient;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-public class E4 {
+public class E4TestEnv {
 
 	// BEGIN: REQUIRED
 	public static final ApplicationName APPLICATION_NAME = ApplicationName.valueOf(getenv("E4_APPLICATION_NAME"));
@@ -37,5 +40,15 @@ public class E4 {
 
 	private static String getenv(String envVarKey) {
 		return getenv(envVarKey, true);
+	}
+
+	public static WebClient newAdminTestWebClient() throws Exception {
+		return ClientFactory.newChromeWebClient(APPLICATION_NAME, APPLICATION_BASE_URL,
+				IN_DIR, OUT_DIR, ADMIN_USERNAME, ADMIN_PASSWORD);
+	}
+
+	public static RestClient newAdminTestRestClient() {
+		return ClientFactory.newRestClient(APPLICATION_NAME, APPLICATION_BASE_URL,
+				ADMIN_USERNAME, ADMIN_PASSWORD);
 	}
 }

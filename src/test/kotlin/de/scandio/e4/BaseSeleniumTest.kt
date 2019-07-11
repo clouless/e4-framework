@@ -2,15 +2,14 @@ package de.scandio.e4
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
-import de.scandio.e4.helpers.DomHelper
 import de.scandio.e4.clients.WebConfluence
 import de.scandio.e4.clients.WebJira
-import de.scandio.e4.testpackages.pocketquery.PocketQueryConfTestPackage
+import de.scandio.e4.helpers.DomHelper
 import de.scandio.e4.worker.client.ApplicationName
-import de.scandio.e4.worker.rest.RestConfluence
 import de.scandio.e4.worker.interfaces.RestClient
 import de.scandio.e4.worker.interfaces.TestPackage
 import de.scandio.e4.worker.interfaces.WebClient
+import de.scandio.e4.worker.rest.RestConfluence
 import de.scandio.e4.worker.rest.RestJira
 import de.scandio.e4.worker.util.Util
 import io.github.bonigarcia.wdm.WebDriverManager
@@ -21,7 +20,7 @@ import org.openqa.selenium.chrome.ChromeOptions
 import org.slf4j.LoggerFactory
 import java.net.URI
 
-open abstract class BaseSeleniumTest {
+abstract class BaseSeleniumTest {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -46,7 +45,7 @@ open abstract class BaseSeleniumTest {
         this.dom = DomHelper(driver, 40, 40)
         this.dom.defaultDuration = 40
         this.dom.defaultWaitTillPresent = 40
-        this.dom.outDir = E4.OUT_DIR
+        this.dom.outDir = E4TestEnv.OUT_DIR
         this.dom.screenshotBeforeClick = true
         this.dom.screenshotBeforeInsert = true
 
@@ -68,7 +67,7 @@ open abstract class BaseSeleniumTest {
         this.dom = DomHelper(driver, 60, 60)
         this.dom.defaultDuration = 120
         this.dom.defaultWaitTillPresent = 120
-        this.dom.outDir = E4.OUT_DIR
+        this.dom.outDir = E4TestEnv.OUT_DIR
         this.dom.screenshotBeforeClick = true
         this.dom.screenshotBeforeInsert = true
 
@@ -84,13 +83,8 @@ open abstract class BaseSeleniumTest {
     }
 
     fun setNewClients() {
-        if (E4.APPLICATION_NAME == ApplicationName.confluence) {
-            this.webClient = WebConfluence(driver, URI(E4.APPLICATION_BASE_URL), E4.IN_DIR, E4.OUT_DIR, E4.ADMIN_USERNAME, E4.ADMIN_PASSWORD)
-            this.restClient = RestConfluence(E4.ADMIN_USERNAME, E4.ADMIN_PASSWORD)
-        } else {
-            this.webClient = WebJira(driver, URI(E4.APPLICATION_BASE_URL), E4.IN_DIR, E4.OUT_DIR, E4.ADMIN_USERNAME, E4.ADMIN_PASSWORD)
-            this.restClient = RestJira(E4.ADMIN_USERNAME, E4.ADMIN_PASSWORD)
-        }
+        this.webClient = E4TestEnv.newAdminTestWebClient()
+        this.restClient = E4TestEnv.newAdminTestRestClient()
     }
 
     open fun shot() {

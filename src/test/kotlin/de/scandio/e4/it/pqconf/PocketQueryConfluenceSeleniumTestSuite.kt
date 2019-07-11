@@ -1,20 +1,17 @@
 package de.scandio.e4.it.pqconf
 
 import de.scandio.e4.BaseSeleniumTest
-import de.scandio.e4.E4
+import de.scandio.e4.E4TestEnv
 import de.scandio.e4.clients.WebConfluence
 import de.scandio.e4.testpackages.pocketquery.PocketQueryConfTestPackage
 import de.scandio.e4.testpackages.pocketquery.pqconf.PocketQueryConfluenceSeleniumHelper
 import org.junit.After
-import org.junit.Before
-import org.junit.BeforeClass
 import org.junit.Test
-import org.slf4j.LoggerFactory
 import java.util.*
 
 class PocketQueryConfluenceSeleniumTestSuite : BaseSeleniumTest() {
 
-    val CONFLUENCE_DB_URL = "jdbc:postgresql://confluence-cluster-${E4.APPLICATION_VERSION_DOT_FREE}-db:5432/confluence"
+    val CONFLUENCE_DB_URL = "jdbc:postgresql://confluence-cluster-${E4TestEnv.APPLICATION_VERSION_DOT_FREE}-db:5432/confluence"
     val CONFLUENCE_DB_NAME = "confluence"
     val CONFLUENCE_DB_USER = "confluence"
     val CONFLUENCE_DB_PWD = "confluence"

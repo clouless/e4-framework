@@ -43,7 +43,7 @@ public class E4Application {
 	}
 
 	public static void startClient(CommandLine parsedArgs) throws Exception {
-		log.info("Starting E4 Client... Enjoy!");
+		log.info("E4 Client... Enjoy!");
 		final E4Client e4Client = new E4Client(parsedArgs);
 		e4Client.start();
 	}
@@ -56,7 +56,7 @@ public class E4Application {
 			port = "4444";
 		}
 
-		log.info("Starting E4 in worker-only mode... Enjoy!");
+		log.info("E4 in worker-only mode... Enjoy!");
 
 		final HashMap<String, Object> props = new HashMap<>();
 		props.put("server.port", port);
@@ -90,7 +90,7 @@ public class E4Application {
 		configOption.setRequired(false);
 		options.addOption(configOption);
 
-		final Option workerOnlyOption = new Option("w", "worker-only", false, "Run this E4 instance in worker-only-mode and listen for commands from an E4 client.");
+		final Option workerOnlyOption = new Option("w", "worker-only", false, "Run this E4 instance in worker-only-mode and listen for commands from an E4TestEnv client.");
 		workerOnlyOption.setRequired(false);
 		options.addOption(workerOnlyOption);
 

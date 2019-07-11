@@ -1,16 +1,15 @@
 package de.scandio.e4.it.pqjira
 
 import de.scandio.e4.BaseSeleniumTest
-import de.scandio.e4.E4
+import de.scandio.e4.E4TestEnv
 import de.scandio.e4.clients.WebJira
-import de.scandio.e4.testpackages.pocketquery.pqconf.PocketQueryJiraTestPackage
 import de.scandio.e4.testpackages.pocketquery.pqjira.PocketQueryJiraSeleniumHelper
 import org.junit.After
 import org.junit.Test
 
 class PocketQueryJiraSeleniumTestSuite : BaseSeleniumTest() {
 
-    val JIRA_DB_URL = "jdbc:postgresql://jira-cluster-${E4.APPLICATION_VERSION_DOT_FREE}-db/jira"
+    val JIRA_DB_URL = "jdbc:postgresql://jira-cluster-${E4TestEnv.APPLICATION_VERSION_DOT_FREE}-db/jira"
     val JIRA_DB_NAME = "jira"
     val JIRA_DB_USER = "jira"
     val JIRA_DB_PASSWORD = "jira"

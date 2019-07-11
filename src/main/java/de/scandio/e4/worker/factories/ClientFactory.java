@@ -1,6 +1,5 @@
 package de.scandio.e4.worker.factories;
 
-import de.scandio.e4.E4;
 import de.scandio.e4.clients.WebConfluence;
 import de.scandio.e4.clients.WebJira;
 import de.scandio.e4.worker.client.ApplicationName;
@@ -39,15 +38,16 @@ public class ClientFactory {
 		return new ChromeDriver(chromeOptions);
 	}
 
-	public static WebClient newChromeWebClient(String username, String password) throws Exception {
+	public static WebClient newChromeWebClient(ApplicationName appName, String baseUrl,
+					String inputDir, String outputDir, String username, String password) throws Exception {
 		WebDriver driver = newChromeDriver();
 		driver.manage().window().setSize(new Dimension(2000, 1500));
-		URI uri = new URI(E4.APPLICATION_BASE_URL);
+		URI uri = new URI(baseUrl);
 		WebClient webClient;
-		if (E4.APPLICATION_NAME == ApplicationName.confluence) {
-			webClient = new WebConfluence(driver, uri, E4.IN_DIR, E4.OUT_DIR, username, password);
+		if (appName == ApplicationName.confluence) {
+			webClient = new WebConfluence(driver, uri, inputDir, outputDir, username, password);
 		} else {
-			webClient = new WebJira(driver, uri, E4.IN_DIR, E4.OUT_DIR, username, password);
+			webClient = new WebJira(driver, uri, inputDir, outputDir, username, password);
 		}
 		return webClient;
 	}
@@ -59,11 +59,11 @@ public class ClientFactory {
 //		return new WebConfluence(driver, new URI(targetUrl), outputDir, username, password);
 //	}
 
-	public static RestClient newRestClient(String username, String password) {
-		if (E4.APPLICATION_NAME == ApplicationName.confluence) {
-			return new RestConfluence(username, password);
+	public static RestClient newRestClient(ApplicationName applicationName, String baseUrl, String username, String password) {
+		if (applicationName == ApplicationName.confluence) {
+			return new RestConfluence(baseUrl, username, password);
 		} else {
-			return new RestJira(username, password);
+			return new RestJira(baseUrl, username, password);
 		}
 	}
 

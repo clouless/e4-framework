@@ -4,8 +4,8 @@ import java.util.List;
 
 public class RestJira extends RestAtlassian {
 
-	public RestJira(String username, String password) {
-		super(username, password);
+	public RestJira(String baseUrl, String username, String password) {
+		super(baseUrl, username, password);
 	}
 
 	@Override
