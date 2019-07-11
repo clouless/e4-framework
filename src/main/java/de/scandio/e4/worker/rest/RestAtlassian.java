@@ -1,12 +1,8 @@
 package de.scandio.e4.worker.rest;
 
 import com.google.gson.Gson;
-import de.scandio.e4.E4;
 import de.scandio.e4.worker.interfaces.RestClient;
-import de.scandio.e4.worker.util.WorkerUtils;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -32,8 +28,8 @@ public abstract class RestAtlassian implements RestClient {
 	protected String password;
 	protected String baseUrl;
 
-	public RestAtlassian(String username, String password) {
-		this.baseUrl = E4.APPLICATION_BASE_URL;
+	public RestAtlassian(String baseUrl, String username, String password) {
+		this.baseUrl = baseUrl;
 		this.username = username;
 		this.password = password;
 	}

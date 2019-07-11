@@ -1,19 +1,11 @@
 package de.scandio.e4.worker.rest;
 
 import com.google.gson.Gson;
-import de.scandio.e4.E4;
-import de.scandio.e4.worker.interfaces.RestClient;
 import de.scandio.e4.worker.util.WorkerUtils;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
-import org.springframework.http.client.BufferingClientHttpRequestFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,8 +20,8 @@ public class RestConfluence extends RestAtlassian {
 
 	private Map<String, Long> contentIds = new HashMap<>();
 
-	public RestConfluence(String username, String password) {
-		super(username, password);
+	public RestConfluence(String baseUrl, String username, String password) {
+		super(baseUrl, username, password);
 	}
 
 	public String findPage(String spaceKey, String title) {

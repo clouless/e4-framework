@@ -1,6 +1,6 @@
 package de.scandio.e4.rest
 
-import de.scandio.e4.E4
+import de.scandio.e4.E4TestEnv
 import de.scandio.e4.worker.rest.RestConfluence
 import org.junit.After
 import org.junit.Before
@@ -24,7 +24,7 @@ class TestGetConfluenceUsers {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    private val restConfluence = RestConfluence(E4.ADMIN_USERNAME, E4.ADMIN_PASSWORD)
+    private val restConfluence = E4TestEnv.newAdminTestRestClient() as RestConfluence
 
     @Before
     fun before() {

@@ -1,6 +1,7 @@
 package de.scandio.e4.testpackages.pocketquery.pqconf
 
 import de.scandio.e4.testpackages.pocketquery.pqjira.PocketQueryJiraSetupAction
+import de.scandio.e4.worker.client.ApplicationName
 import de.scandio.e4.worker.collections.ActionCollection
 import de.scandio.e4.worker.collections.VirtualUserCollection
 import de.scandio.e4.worker.interfaces.TestPackage
@@ -29,6 +30,10 @@ class PocketQueryJiraTestPackage: TestPackage {
         // add create project
         // add pq settings in project
         return actions
+    }
+
+    override fun getApplicationName(): ApplicationName {
+        return ApplicationName.jira
     }
 
 }

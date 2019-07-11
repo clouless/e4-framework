@@ -1,17 +1,10 @@
 package de.scandio.e4.testpackages.vanilla
 
-import de.scandio.e4.E4
+import de.scandio.e4.E4TestEnv
 import de.scandio.e4.testpackages.TestPackageTestRun
-import de.scandio.e4.testpackages.pagebranching.actions.CreateBranchAction
-import de.scandio.e4.testpackages.pagebranching.actions.CreateOverviewPageAction
-import de.scandio.e4.testpackages.pagebranching.actions.MergeBranchAction
-import de.scandio.e4.testpackages.pagebranching.virtualusers.*
 import de.scandio.e4.testpackages.vanilla.actions.*
-import de.scandio.e4.worker.collections.ActionCollection
-import de.scandio.e4.worker.interfaces.TestPackage
 import org.junit.Before
 import org.junit.Test
-import java.util.*
 
 class VanillaTestRun : TestPackageTestRun() {
 
@@ -24,7 +17,7 @@ class VanillaTestRun : TestPackageTestRun() {
 
     @Test
     fun runTest() {
-        if (E4.PREPARATION_RUN) {
+        if (E4TestEnv.PREPARATION_RUN) {
             executeTestPackagePrepare(TEST_PACKAGE)
         } else {
 //                executeTestPackage(TEST_PACKAGE)

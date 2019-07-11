@@ -1,7 +1,7 @@
 package de.scandio.e4.setup
 
 import de.scandio.e4.BaseSeleniumTest
-import de.scandio.e4.E4
+import de.scandio.e4.E4TestEnv
 import de.scandio.e4.clients.WebConfluence
 import org.junit.After
 import org.junit.Before
@@ -64,7 +64,7 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
     }
 
     fun setupDatabase() {
-        driver.navigate().to(E4.APPLICATION_BASE_URL) // TODO use webConfluence.navigateTo
+        driver.navigate().to(E4TestEnv.APPLICATION_BASE_URL) // TODO use webConfluence.navigateTo
         dom.awaitSeconds(3) // just wait a bit for safety
 
         /* Step 1: Test vs. Production */
@@ -78,7 +78,7 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
 
         /* Step 3: License */
         dom.click("#confLicenseString")
-        dom.insertText("#confLicenseString", E4.APPLICATION_LICENSE)
+        dom.insertText("#confLicenseString", E4TestEnv.APPLICATION_LICENSE)
         dom.click("#setupTypeCustom")
 
         /* Step 4: Cluster configuration */
@@ -136,7 +136,7 @@ open class ConfluenceDataCenterSetup : BaseSeleniumTest() {
         var pollCount = 1
         while (true) {
             refreshWebClient(false, false)
-            driver.navigate().to(E4.APPLICATION_BASE_URL)
+            driver.navigate().to(E4TestEnv.APPLICATION_BASE_URL)
             dom.awaitSeconds(10)
             if (dom.isElementPresent("form[action='setupdata.action']")) {
                 log.info("+++++++++++++++++++++++++++++++++++++++++!")

@@ -371,7 +371,7 @@ else
 
     if [[ "$ACTION" == "create" && ! $E4_PROV_KEY ]]
     then
-        echo -e $C_RED">> param error ........: Please specify E4 provisioning key -k or --provkey. E.g. --provkey conf6153_large"$C_RST
+        echo -e $C_RED">> param error ........: Please specify E4TestEnv provisioning key -k or --provkey. E.g. --provkey conf6153_large"$C_RST
         EXIT=1
     fi
 

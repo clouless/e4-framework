@@ -2,11 +2,12 @@ package de.scandio.e4.testpackages
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
-import de.scandio.e4.E4
+import de.scandio.e4.E4TestEnv
 import de.scandio.e4.worker.client.NoopWebClient
 import de.scandio.e4.worker.collections.ActionCollection
 import de.scandio.e4.worker.factories.ClientFactory
 import de.scandio.e4.worker.interfaces.Action
+import de.scandio.e4.worker.interfaces.RestClient
 import de.scandio.e4.worker.interfaces.TestPackage
 import de.scandio.e4.worker.interfaces.WebClient
 import de.scandio.e4.worker.rest.RestConfluence
@@ -60,10 +61,10 @@ abstract class TestPackageTestRun {
     protected fun executeAction(action: Action) {
         var webClient: WebClient = NoopWebClient()
         if (!action.isRestOnly()) {
-            webClient = ClientFactory.newChromeWebClient(E4.ADMIN_USERNAME, E4.ADMIN_PASSWORD)
+            webClient = E4TestEnv.newAdminTestWebClient()
             webClient.webDriver.manage().window().size = Dimension(2000, 1500)
         }
-        val restConfluence = RestConfluence(E4.ADMIN_USERNAME, E4.ADMIN_PASSWORD)
+        val restConfluence = E4TestEnv.newAdminTestRestClient()
         log.info("Executing action ${action.javaClass.simpleName}")
         val runtimeName = "afteraction-${action.javaClass.simpleName}"
         try {
@@ -87,9 +88,9 @@ abstract class TestPackageTestRun {
             if (actions.allRestOnly()) {
                 webClient = NoopWebClient()
             } else {
-                webClient = ClientFactory.newChromeWebClient(E4.ADMIN_USERNAME, E4.ADMIN_PASSWORD)
+                webClient = E4TestEnv.newAdminTestWebClient()
             }
-            val restClient = ClientFactory.newRestClient(E4.ADMIN_USERNAME, E4.ADMIN_PASSWORD)
+            val restClient = E4TestEnv.newAdminTestRestClient()
             try {
                 log.info("Executing action ${action.javaClass.simpleName}")
                 action.execute(webClient, restClient)
@@ -112,7 +113,7 @@ abstract class TestPackageTestRun {
 
     open fun shot(webClient: WebClient) {
         this.screenshotCount += 1
-        val path = this.util.takeScreenshot(webClient.webDriver, "${E4.OUT_DIR}/$screenshotCount-test-run.png")
+        val path = this.util.takeScreenshot(webClient.webDriver, "${E4TestEnv.OUT_DIR}/$screenshotCount-test-run.png")
         print(path)
     }
 
