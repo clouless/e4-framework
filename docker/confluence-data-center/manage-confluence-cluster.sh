@@ -459,7 +459,7 @@ then
     do
         kill_instance_confluencenode $node_id
         start_instance_confluencenode $node_id
-	echo "Wait for 10sec after node start"
+	echo "Wait for 5sec after node start"
 	sleep 5
 	echo ""
     done
