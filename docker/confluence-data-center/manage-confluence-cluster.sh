@@ -452,15 +452,15 @@ then
     start_instance_loadbalancer $SCALE
     echo ""
 
-    echo ">>> Waiting for 20sec for database restore"
-    sleep 20
+    echo ">>> Waiting for 5sec for database restore"
+    sleep 5
 
     for (( node_id=1; node_id<=$SCALE; node_id++ ))
     do
         kill_instance_confluencenode $node_id
         start_instance_confluencenode $node_id
-	echo "Sleeping for 10sec after node start"
-	sleep 10
+	echo "Wait for 10sec after node start"
+	sleep 5
 	echo ""
     done
     echo ""
