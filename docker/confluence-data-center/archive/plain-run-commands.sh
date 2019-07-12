@@ -41,9 +41,13 @@ docker run \
     --net=confluence-cluster-6153 \
     --net-alias=confluence-cluster-6153-node1 \
     --env NODE_NUMBER=1 \
+    --env E4_PROV_KEY=conf6153 \
+    --env E4_PROV_DIR=$E4_PROV_DIR \
     -v confluence-shared-home-6153:/confluence-shared-home \
-    -p 5005:5005 \
-    -p 4330:4330 \
-    -v $(pwd)/confluencenode:/work-my \
-    --entrypoint /work-my/docker-entrypoint.sh \
+    -p "5001:5001" \
+    -p "4331:4331" \
+    -p "9091:9091" \
+    -v $(pwd)/confluencenode:/e4work \
+    -v $E4_PROV_DIR:/e4prov \
+    --entrypoint /e4work/docker-entrypoint.sh \
     -it codeclou/docker-atlassian-confluence-data-center:confluencenode-6.15.3

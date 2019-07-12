@@ -51,11 +51,22 @@ abstract class WebAtlassian(
 
     override fun getNodeId(): String {
         var nodeId = ""
+        var nodeKey = ""
+        var nodeName = ""
         try {
-            nodeId = dom.findElement("#footer-cluster-node").text
-            nodeId = nodeId.replace("(", "").replace(")", "").replace(" ", "")
+            nodeKey = dom.findElement("meta[name='confluence-cluster-node-id']").getAttribute("value")
+            nodeName = dom.findElement("meta[name='confluence-cluster-node-name']").getAttribute("value")
+            nodeId = "$nodeName:$nodeKey"
         } catch (e: Exception) {
-            log.warn("Could not obtain node ID from footer. Leaving blank.")
+            try {
+                log.warn("Could not determine node ID from meta tags. Trying with footer.", e)
+                nodeId = dom.findElement("#footer-cluster-node").text
+                nodeId = nodeId.replace("(", "").replace(")", "").replace(" ", "")
+            } catch (e: Exception) {
+                takeScreenshot("missing-nodeid")
+                dumpHtml("missing-nodeid")
+                log.warn("Could not obtain node ID neither from meta tags nor footer. Leaving blank.", e)
+            }
         }
         return nodeId
     }

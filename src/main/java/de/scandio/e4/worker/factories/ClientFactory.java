@@ -22,7 +22,7 @@ public class ClientFactory {
 	public static WebDriver newChromeDriver() {
 		WebDriverManager.chromedriver().setup();
 		ChromeOptions chromeOptions = new ChromeOptions();
-		chromeOptions.setPageLoadStrategy(PageLoadStrategy.NONE); // https://www.skptricks.com/2018/08/timed-out-receiving-message-from-renderer-selenium.html
+//		chromeOptions.setPageLoadStrategy(PageLoadStrategy.NONE); // https://www.skptricks.com/2018/08/timed-out-receiving-message-from-renderer-selenium.html
 		chromeOptions.addArguments("start-maximized");
 		chromeOptions.addArguments("disable-extensions");
 		chromeOptions.addArguments("enable-automation");
