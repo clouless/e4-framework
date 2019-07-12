@@ -48,17 +48,12 @@ NODE_ID="node${NODE_NUMBER}"
 sed -i -e "s/export CATALINA_OPTS/#replaced/g" /confluence/atlassian-confluence-latest/bin/setenv.sh
 echo -e "CATALINA_OPTS=\"-Dconfluence.cluster.node.name=${NODE_ID} \${CATALINA_OPTS}\"\n" >> /confluence/atlassian-confluence-latest/bin/setenv.sh
 echo -e "CATALINA_OPTS=\"-Dsynchrony.service.url=http://confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-lb:${CONFLUENCE_VERSION_DOT_FREE}/synchrony/v1 \${CATALINA_OPTS}\"\n" >> /confluence/atlassian-confluence-latest/bin/setenv.sh
-echo -e "CATALINA_OPTS=\"-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=9090 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.net.preferIPv4Stack=true -Djava.rmi.server.hostname=127.0.0.1 \${CATALINA_OPTS}\"\n" >> /confluence/atlassian-confluence-latest/bin/setenv.sh
-#"-Djava.rmi.server.hostname=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-lb" >> /confluence/atlassian-confluence-latest/bin/setenv.sh
-
 echo -e "\nexport CATALINA_OPTS" >> /confluence/atlassian-confluence-latest/bin/setenv.sh
 
 # BEGIN: edit
 sed -i 's/Xmx1024/Xmx2048/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
 sed -i 's/Xms1024/Xms2048/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
 # END: edit
-
-cat /confluence/atlassian-confluence-latest/bin/setenv.sh
 
 #
 # PATCH server.xml FOR PROXY USE
