@@ -1,4 +1,4 @@
 #!/bin/bash
-ssh e4w 'bash -s' < startworker-local.sh $1 $2
+ssh $1  'bash -s' < startworker-local.sh $2 $3
 sleep 3
-ssh -t e4w 'docker logs --follow $(docker ps -q)'
+ssh -t $1 'docker logs --follow $(docker ps -q)'

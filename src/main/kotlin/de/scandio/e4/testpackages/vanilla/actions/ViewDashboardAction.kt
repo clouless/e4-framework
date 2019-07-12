@@ -7,7 +7,9 @@ import de.scandio.e4.worker.interfaces.Action
 import de.scandio.e4.worker.interfaces.WebClient
 import java.util.*
 
-open class ViewDashboardAction : Action() {
+open class ViewDashboardAction(
+        var loadedSelector: String = ".stickable:not(.loading)"
+) : Action() {
 
     protected var start: Long = 0
     protected var end: Long = 0
@@ -18,7 +20,7 @@ open class ViewDashboardAction : Action() {
         webConfluence.login()
         this.start = Date().time
         webConfluence.goToDashboard()
-        dom.awaitElementPresent("#page")
+        dom.awaitElementPresent(loadedSelector)
         this.end = Date().time
     }
 

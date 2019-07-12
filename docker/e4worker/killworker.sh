@@ -1,2 +1,2 @@
 #!/bin/bash
-ssh -t e4w 'docker kill $(docker ps -q)'
+ssh -t $1 'docker kill $(docker ps -q)'

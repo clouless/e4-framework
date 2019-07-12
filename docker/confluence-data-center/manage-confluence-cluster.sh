@@ -417,7 +417,7 @@ then
       download_synchrony
     fi
 
-    if [[ ! -d $E4_PROV_DIR/$E4_PROV_KEY ]];
+    if [[ ! -d $E4_PROV_DIR/$E4_PROV_KEY/confluence-home ]];
     then
       echo ">> Download provisioning set for Confluence $CONFLUENCE_VERSION with key $E4_PROV_KEY"
       download_confluence $E4_PROV_KEY
@@ -452,8 +452,8 @@ then
     start_instance_loadbalancer $SCALE
     echo ""
 
-    echo ">>> Waiting for 5sec for database restore"
-    sleep 5
+    echo ">>> Waiting for 30sec for database restore"
+    sleep 30
 
     for (( node_id=1; node_id<=$SCALE; node_id++ ))
     do

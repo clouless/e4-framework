@@ -23,7 +23,7 @@ class VanillaTestRun : TestPackageTestRun() {
 //                executeTestPackage(TEST_PACKAGE)
 
             // Run a single action for testing:
-             executeAction(AddRandomCommentAction())
+             executeAction(ViewDashboardAction())
 
             // Run single virtual user for testing:
             // executeActions(BranchCreator().actions)

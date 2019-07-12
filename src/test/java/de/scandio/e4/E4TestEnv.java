@@ -5,7 +5,6 @@ import de.scandio.e4.worker.factories.ClientFactory;
 import de.scandio.e4.worker.interfaces.RestClient;
 import de.scandio.e4.worker.interfaces.WebClient;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 public class E4TestEnv {
 
@@ -14,8 +13,8 @@ public class E4TestEnv {
 	public static final String APPLICATION_BASE_URL = resolveBaseUrl("E4_APPLICATION_BASE_URL");
 	public static final String OUT_DIR = getenv("E4_OUT_DIR");
 	public static final String IN_DIR = getenv("E4_IN_DIR");
-	public static final String ADMIN_USERNAME = getenv("E4_ADMIN_USER");
-	public static final String ADMIN_PASSWORD = getenv("E4_ADMIN_PWD");
+	public static final String USER_NAME = getenv("E4_USER_NAME");
+	public static final String USER_PASSWORD = getenv("E4_USER_PASSWORD");
 	public static final String APPLICATION_VERSION = getenv("E4_APPLICATION_VERSION");
 	public static final String APPLICATION_VERSION_DOT_FREE = APPLICATION_VERSION.replace(".", "");
 	// END: REQUIRED
@@ -44,11 +43,11 @@ public class E4TestEnv {
 
 	public static WebClient newAdminTestWebClient() throws Exception {
 		return ClientFactory.newChromeWebClient(APPLICATION_NAME, APPLICATION_BASE_URL,
-				IN_DIR, OUT_DIR, ADMIN_USERNAME, ADMIN_PASSWORD);
+				IN_DIR, OUT_DIR, USER_NAME, USER_PASSWORD);
 	}
 
 	public static RestClient newAdminTestRestClient() {
 		return ClientFactory.newRestClient(APPLICATION_NAME, APPLICATION_BASE_URL,
-				ADMIN_USERNAME, ADMIN_PASSWORD);
+				USER_NAME, USER_PASSWORD);
 	}
 }

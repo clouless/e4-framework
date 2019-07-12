@@ -5,12 +5,15 @@ import de.scandio.e4.worker.interfaces.RestClient;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -88,7 +91,9 @@ public abstract class RestAtlassian implements RestClient {
 
 	protected ResponseEntity<String> sendGetRequestReturnResponse(String urlAfterBaseUrl) {
 		final String url = this.baseUrl + urlAfterBaseUrl;
-		final RestTemplate restTemplate = new RestTemplate();
+		final RestTemplate restTemplate = new RestTemplateBuilder()
+				.setConnectTimeout(Duration.ofSeconds(40))
+				.setReadTimeout(Duration.ofSeconds(40)).build();
 
 		log.debug("Sending GET request {{}}", url);
 

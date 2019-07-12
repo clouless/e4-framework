@@ -1,2 +1,2 @@
 #!/bin/bash
-ssh -t e4w 'docker logs --follow $(docker ps -q)'
+ssh -t $1 'docker logs --follow $(docker ps -q)'
