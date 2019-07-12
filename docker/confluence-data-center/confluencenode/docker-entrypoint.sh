@@ -51,8 +51,8 @@ echo -e "CATALINA_OPTS=\"-Dsynchrony.service.url=http://confluence-cluster-${CON
 echo -e "\nexport CATALINA_OPTS" >> /confluence/atlassian-confluence-latest/bin/setenv.sh
 
 # BEGIN: edit
-sed -i 's/Xmx1024/Xmx2048/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
-sed -i 's/Xms1024/Xms2048/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
+sed -i 's/Xmx1024/Xmx6144/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
+sed -i 's/Xms1024/Xms6144/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
 # END: edit
 
 #

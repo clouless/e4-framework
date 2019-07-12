@@ -187,7 +187,7 @@ public class TestRunnerService {
 						applicationStatusService.getOutputDir(), username, password);
 				restClient = ClientFactory.newRestClient(testPackage.getApplicationName(), targetUrl, username, password);
 				action.executeWithRandomDelay(webClient, restClient);
-				if (new Date().getTime() % 10 == 0) {
+				if (log.isDebugEnabled() && new Date().getTime() % 10 == 0) {
 					String screenshotPath = webClient.takeScreenshot("afteraction-" + action.getClass().getSimpleName());
 					webClient.dumpHtml("afteraction-" + action.getClass().getSimpleName());
 					log.info("Sample screenshot (and html with same path): {{}}", screenshotPath);
