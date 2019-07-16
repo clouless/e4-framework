@@ -89,13 +89,7 @@ public class TestRunnerService {
 			vuserIndex++;
 		}
 
-		for (int i = 0; i < virtualUserThreads.size(); i++) {
-			Thread.sleep(1000);
-			log.info("Starting user thread at index {{}}", i);
-			virtualUserThreads.get(i).start();
-		}
-
-//		virtualUserThreads.forEach(Thread::start);
+		virtualUserThreads.forEach(Thread::start);
 		applicationStatusService.setTestsStatus(TestsStatus.RUNNING);
 
 		log.info("Waiting for tests to finish...");
