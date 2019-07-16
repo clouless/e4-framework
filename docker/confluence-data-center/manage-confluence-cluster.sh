@@ -459,8 +459,13 @@ then
     do
         kill_instance_confluencenode $node_id
         start_instance_confluencenode $node_id
-	echo "Wait for 5sec after node start"
-	sleep 5
+	if [[ "${node_id}" = "1" ]];
+	then
+	  echo "Wait for 20sec after node start"
+	  sleep 20
+        else
+	  echo "FAIL?"
+	fi
 	echo ""
     done
     echo ""
