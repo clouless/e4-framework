@@ -61,8 +61,8 @@ sed -i 's/Xms1024/Xms8192/g' /confluence/atlassian-confluence-latest/bin/setenv.
 sed -i -e "s/port=\"8090\"/port=\"8090\" proxyName=\"${LB_NAME}\" proxyPort=\"${LB_PORT}\" scheme=\"http\"/g" /confluence/atlassian-confluence-latest/conf/server.xml
 
 # BEGIN: EDIT
-sed -i -e "s/connectionTimeout=\"20000\"/connectionTimeout=\"40000\"/g" /confluence/atlassian-confluence-latest/conf/server.xml
-sed -i -e "s/maxThreads=\"48\"/maxThreads=\"70\"/g" /confluence/atlassian-confluence-latest/conf/server.xml
+sed -i -e "s/connectionTimeout=\"20000\"/connectionTimeout=\"30000\"/g" /confluence/atlassian-confluence-latest/conf/server.xml
+#sed -i -e "s/maxThreads=\"48\"/maxThreads=\"48\"/g" /confluence/atlassian-confluence-latest/conf/server.xml
 # END: EDIT
 
 #
