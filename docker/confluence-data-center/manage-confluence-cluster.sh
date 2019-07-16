@@ -116,7 +116,7 @@ function start_instance_database {
         --env E4_PROV_KEY=$E4_PROV_KEY \
         -v $(pwd)/postgres:/docker-entrypoint-initdb.d \
         -v $E4_PROV_DIR:/e4prov \
-        -d postgres:${POSTGRESQL_VERSION} -c max_connections=300 -c shared_buffers=2GB -c effective_cache_size=8GB -c checkpoint_timeout=5min -c wal_level=minimal -c autovacuum=off
+        -d postgres:${POSTGRESQL_VERSION} -c max_connections=350 -c shared_buffers=2GB -c effective_cache_size=8GB -c checkpoint_timeout=5min -c wal_level=minimal -c autovacuum=off
 }
 
 function start_instance_loadbalancer {
@@ -134,42 +134,22 @@ function start_instance_loadbalancer {
 }
 
 function start_instance_confluencenode {
-	if [[ "${1}" = "1" ]];
-    then
-        docker run \
-            --rm \
-            --name confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-node${1} \
-            --net=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE} \
-            --net-alias=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-node${1} \
-            --env NODE_NUMBER=${1} \
-            --env E4_PROV_KEY=$E4_PROV_KEY \
-            --env E4_PROV_DIR=$E4_PROV_DIR \
-            -v confluence-shared-home-${CONFLUENCE_VERSION_DOT_FREE}:/confluence-shared-home \
-            -p "500$1:500$1" \
-            -p "433$1:433$1" \
-            -v $(pwd)/confluencenode:/e4work \
-            -v $E4_PROV_DIR:/e4prov \
-            --entrypoint /e4work/docker-entrypoint.sh \
-            -d codeclou/docker-atlassian-confluence-data-center:confluencenode-${CONFLUENCE_VERSION}
-    else
-        docker run \
-            --rm \
-            --name confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-node${1} \
-            --net=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE} \
-            --net-alias=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-node${1} \
-            --env NODE_NUMBER=${1} \
-            --env E4_PROV_KEY=$E4_PROV_KEY \
-            --env E4_PROV_DIR=$E4_PROV_DIR \
-            -v confluence-shared-home-${CONFLUENCE_VERSION_DOT_FREE}:/confluence-shared-home \
-            -p "500$1:500$1" \
-            -p "433$1:433$1" \
-            -v $(pwd)/confluencenode:/e4work \
-            -v $E4_PROV_DIR:/e4prov \
-            --entrypoint /e4work/docker-entrypoint.sh \
-            -it codeclou/docker-atlassian-confluence-data-center:confluencenode-${CONFLUENCE_VERSION}
-	fi
     echo -e $C_CYN">> docker run .........:${C_RST}${C_GRN} Starting${C_RST}  - Starting instance confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-node${1}."
-
+    docker run \
+        --rm \
+        --name confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-node${1} \
+        --net=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE} \
+        --net-alias=confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-node${1} \
+        --env NODE_NUMBER=${1} \
+        --env E4_PROV_KEY=$E4_PROV_KEY \
+        --env E4_PROV_DIR=$E4_PROV_DIR \
+        -v confluence-shared-home-${CONFLUENCE_VERSION_DOT_FREE}:/confluence-shared-home \
+        -p "500$1:500$1" \
+        -p "433$1:433$1" \
+        -v $(pwd)/confluencenode:/e4work \
+        -v $E4_PROV_DIR:/e4prov \
+        --entrypoint /e4work/docker-entrypoint.sh \
+        -d codeclou/docker-atlassian-confluence-data-center:confluencenode-${CONFLUENCE_VERSION}
 }
 
 function download_synchrony {
@@ -484,8 +464,7 @@ then
           echo ">>> Wait for 30sec after start of Node = 1"
           sleep 30
         else
-          echo ">>> Wait for 10sec after start of Node != 1"
-          sleep 10
+          echo ">>> No need to wait after start of Node != 1"
         fi
 	echo ""
     done
