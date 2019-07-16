@@ -70,7 +70,7 @@ public class RestConfluence extends RestAtlassian {
 	public Long getRandomContentId(String spaceKey, String parentPageTitle) {
 		Long contentId;
 		if (StringUtils.isBlank(parentPageTitle)) {
-			contentId = WorkerUtils.getRandomItem(findContentIds(1000, null, spaceKey));
+			contentId = WorkerUtils.getRandomItem(findContentIds(100, null, spaceKey));
 		} else {
 			contentId = WorkerUtils.getRandomItem(findChildPageIds(spaceKey, parentPageTitle));
 		}
