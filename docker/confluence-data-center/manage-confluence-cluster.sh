@@ -116,7 +116,7 @@ function start_instance_database {
         --env E4_PROV_KEY=$E4_PROV_KEY \
         -v $(pwd)/postgres:/docker-entrypoint-initdb.d \
         -v $E4_PROV_DIR:/e4prov \
-        -d postgres:${POSTGRESQL_VERSION} -c max_connections=300 -c shared_buffers=80MB -c checkpoint_timeout=5min -c wal_level=minimal -c autovacuum=off
+        -d postgres:${POSTGRESQL_VERSION} -c max_connections=300 -c shared_buffers=2GB -c effective_cache_size=8GB -c checkpoint_timeout=5min -c wal_level=minimal -c autovacuum=off
 }
 
 function start_instance_loadbalancer {
@@ -461,10 +461,10 @@ then
         start_instance_confluencenode $node_id
 	if [[ "${node_id}" = "1" ]];
 	then
-	  echo "Wait for 20sec after node start"
+	  echo ">>> Wait for 20sec after start of Node = 1"
 	  sleep 20
         else
-	  echo "FAIL?"
+	  echo ">>> Not waiting for Node != 1"
 	fi
 	echo ""
     done
