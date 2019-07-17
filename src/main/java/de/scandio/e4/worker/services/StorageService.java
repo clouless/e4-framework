@@ -8,10 +8,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
 import java.sql.*;
+import java.util.*;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 @Service
@@ -34,6 +32,7 @@ public class StorageService {
 		this.applicationStatusService = applicationStatusService;
 		String databaseFileName = "e4-" + new Date().getTime() + ".sqlite";
 		this.databaseFilePath = "jdbc:sqlite:" + this.applicationStatusService.getOutputDir() + "/" + databaseFileName;
+		this.userRandomEntityIds = new HashMap<>();
 		initDatabase();
 	}
 

@@ -15,10 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -28,6 +27,8 @@ public class TestRunnerService {
 	private final ApplicationStatusService applicationStatusService;
 	private final StorageService storageService;
 	private final UserCredentialsService userCredentialsService;
+
+	private int numFinishedThreads = 0;
 
 	public TestRunnerService(ApplicationStatusService applicationStatusService, StorageService storageService, UserCredentialsService userCredentialsService) {
 		this.applicationStatusService = applicationStatusService;
@@ -89,14 +90,20 @@ public class TestRunnerService {
 			vuserIndex++;
 		}
 
-		virtualUserThreads.forEach(Thread::start);
+		final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(virtualUserThreads.size());
+		for (Thread thread : virtualUserThreads) {
+			executor.schedule(thread, new Random().nextInt(30000), TimeUnit.MILLISECONDS);
+		}
+
 		applicationStatusService.setTestsStatus(TestsStatus.RUNNING);
 
-		log.info("Waiting for tests to finish...");
-		for (Thread virtualUserThread : virtualUserThreads) {
-			virtualUserThread.join();
+		int numVirtualUsers = virtualUserThreads.size();
+		while (this.numFinishedThreads < numVirtualUsers) {
+			log.info(">>> MAIN: Checking finished threads: {{}}", this.numFinishedThreads);
+			Thread.sleep(3000);
 		}
-		log.info("All tests are finished! Your database is at {{}}", storageService.getDatabaseFilePath());
+
+		log.info(">>> MAIN: All tests are finished! Your database is at {{}}", storageService.getDatabaseFilePath());
 
 		applicationStatusService.setTestsStatus(TestsStatus.FINISHED);
 	}
@@ -111,39 +118,42 @@ public class TestRunnerService {
 	}
 
 	private Thread createUserThread(TestPackage testPackage, VirtualUser virtualUser, WorkerConfig config) throws Exception {
+		final long threadCreationTime = new Date().getTime();
 		final String targetUrl = config.getTarget();
 		final long durationInSeconds = config.getDurationInSeconds();
+		String username;
+		String password;
+		if (virtualUser.isAdminRequired()) {
+			username = config.getUsername();
+			password = config.getPassword();
+		} else {
+			final UserCredentials randomUser = userCredentialsService.getRandomUser();
+			username = randomUser.getUsername();
+			password = randomUser.getPassword();
+		}
+
+		log.info("Executing virtual user {{}} with actual user {{}}", virtualUser.getClass().getSimpleName(), username);
+		RestClient initialRestClient = ClientFactory.newRestClient(
+				testPackage.getApplicationName(), storageService, targetUrl, username, password);
+		log.info("Requesting random set of content entities with REST for user {{}}", username);
+		List<Long> entityIds = initialRestClient.getRandomEntityIds(100);
+		storageService.setRandomEntityIdsForUser(username, entityIds);
 
 		final Thread virtualUserThread = new Thread(() -> {
 			try {
-				String username;
-				String password;
-				if (virtualUser.isAdminRequired()) {
-					username = config.getUsername();
-					password = config.getPassword();
-				} else {
-					final UserCredentials randomUser = userCredentialsService.getRandomUser();
-					username = randomUser.getUsername();
-					password = randomUser.getPassword();
-				}
-
-				log.info("Executing virtual user {{}} with actual user {{}}", virtualUser.getClass().getSimpleName(), username);
-				RestClient initialRestClient = ClientFactory.newRestClient(
-						testPackage.getApplicationName(), storageService, targetUrl, username, password);
-				log.info("Requesting random set of content entities with REST for user {{}}", username);
-				List<Long> entityIds = initialRestClient.getRandomEntityIds(100);
-				storageService.setRandomEntityIdsForUser(username, entityIds);
-
 				final long threadStartTime = new Date().getTime();
+				final long delayInSeconds = (threadStartTime - threadCreationTime) / 1000;
+				log.info("Thread for user {{}} started after {{}} seconds", username, delayInSeconds);
 
 				if (durationInSeconds > 0) {
 					while (true) {
 						long timePassedSinceStart = new Date().getTime() - threadStartTime;
 						if (timePassedSinceStart < durationInSeconds * 1000) {
-							log.info("{{}}ms have passed since start which is below {{}}sec. Running again.", timePassedSinceStart, durationInSeconds);
+							log.info("{{}}s have passed since start which is below {{}}sec. Running again.", timePassedSinceStart / 1000, durationInSeconds);
 							runActions(testPackage, virtualUser, threadStartTime, durationInSeconds, targetUrl, username, password);
 						} else {
 							log.info("{{}}ms have passed since start which is above {{}}sec. Stopping.", timePassedSinceStart, durationInSeconds);
+							this.numFinishedThreads += 1;
 							break;
 						}
 					}
@@ -192,7 +202,7 @@ public class TestRunnerService {
 						applicationStatusService.getOutputDir(), username, password);
 				restClient = ClientFactory.newRestClient(testPackage.getApplicationName(), storageService, targetUrl, username, password);
 				action.executeWithRandomDelay(webClient, restClient);
-				if (log.isDebugEnabled() && new Date().getTime() % 10 == 0) {
+				if (/*log.isDebugEnabled() && */new Date().getTime() % 10 == 0) {
 					String screenshotPath = webClient.takeScreenshot("afteraction-" + action.getClass().getSimpleName());
 					webClient.dumpHtml("afteraction-" + action.getClass().getSimpleName());
 					log.info("Sample screenshot (and html with same path): {{}}", screenshotPath);
