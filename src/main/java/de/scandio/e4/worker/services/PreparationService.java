@@ -54,7 +54,7 @@ public class PreparationService {
         final TestPackage testPackageInstance = testPackage.newInstance();
 
         final ActionCollection setupScenarios = testPackageInstance.getSetupActions();
-        final RestClient restClient = ClientFactory.newRestClient(testPackageInstance.getApplicationName(),
+        final RestClient restClient = ClientFactory.newRestClient(testPackageInstance.getApplicationName(), storageService,
 				config.getTarget(), config.getUsername(), config.getPassword());
 
         try {

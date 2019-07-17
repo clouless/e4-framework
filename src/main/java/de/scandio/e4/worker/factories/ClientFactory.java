@@ -7,6 +7,7 @@ import de.scandio.e4.worker.interfaces.RestClient;
 import de.scandio.e4.worker.interfaces.WebClient;
 import de.scandio.e4.worker.rest.RestConfluence;
 import de.scandio.e4.worker.rest.RestJira;
+import de.scandio.e4.worker.services.StorageService;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.PageLoadStrategy;
@@ -59,11 +60,11 @@ public class ClientFactory {
 //		return new WebConfluence(driver, new URI(targetUrl), outputDir, username, password);
 //	}
 
-	public static RestClient newRestClient(ApplicationName applicationName, String baseUrl, String username, String password) {
+	public static RestClient newRestClient(ApplicationName applicationName, StorageService storageService, String baseUrl, String username, String password) {
 		if (applicationName == ApplicationName.confluence) {
-			return new RestConfluence(baseUrl, username, password);
+			return new RestConfluence(storageService, baseUrl, username, password);
 		} else {
-			return new RestJira(baseUrl, username, password);
+			return new RestJira(storageService, baseUrl, username, password);
 		}
 	}
 

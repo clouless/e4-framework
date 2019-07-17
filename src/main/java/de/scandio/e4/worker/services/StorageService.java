@@ -6,8 +6,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Nullable;
 import java.sql.*;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 @Service
@@ -23,6 +27,8 @@ public class StorageService {
 	private int workerIndex;
 	private Connection connection;
 	private final String databaseFilePath;
+
+	private Map<String, List<Long>> userRandomEntityIds;
 
 	public StorageService(ApplicationStatusService applicationStatusService) throws Exception {
 		this.applicationStatusService = applicationStatusService;
@@ -116,5 +122,14 @@ public class StorageService {
 
 	public String getDatabaseFilePath() {
 		return databaseFilePath;
+	}
+
+	@Nullable
+	public List<Long> getRandomEntityIdsForUser(String username) {
+		return userRandomEntityIds.get(username);
+	}
+
+	public void setRandomEntityIdsForUser(String username, List<Long> entityIds) {
+		this.userRandomEntityIds.put(username, entityIds);
 	}
 }

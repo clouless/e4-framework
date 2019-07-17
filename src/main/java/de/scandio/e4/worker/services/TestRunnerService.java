@@ -18,10 +18,12 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 
 @Service
 public class TestRunnerService {
+
 	private static final Logger log = LoggerFactory.getLogger(TestRunnerService.class);
 	private final ApplicationStatusService applicationStatusService;
 	private final StorageService storageService;
@@ -73,8 +75,6 @@ public class TestRunnerService {
 		final List<Thread> virtualUserThreads = new ArrayList<>();
 		final int numVirtualUsersThisWorker = numConcurrentUsers / numWorkers;
 
-		final List<UserCredentials> allUserCredentials = userCredentialsService.getAllUsers();
-		final UserCredentials userCredentials = WorkerUtils.getRandomItem(allUserCredentials);
 		final int workerIndex = storageService.getWorkerIndex();
 
 		log.info("This worker with index {{}} needs to start {{}} users.", workerIndex, numVirtualUsersThisWorker);
@@ -128,6 +128,11 @@ public class TestRunnerService {
 				}
 
 				log.info("Executing virtual user {{}} with actual user {{}}", virtualUser.getClass().getSimpleName(), username);
+				RestClient initialRestClient = ClientFactory.newRestClient(
+						testPackage.getApplicationName(), storageService, targetUrl, username, password);
+				log.info("Requesting random set of content entities with REST for user {{}}", username);
+				List<Long> entityIds = initialRestClient.getRandomEntityIds(100);
+				storageService.setRandomEntityIdsForUser(username, entityIds);
 
 				final long threadStartTime = new Date().getTime();
 
@@ -185,7 +190,7 @@ public class TestRunnerService {
 				log.debug("Executing action {{}}", action.getClass().getSimpleName());
 				webClient = ClientFactory.newChromeWebClient(testPackage.getApplicationName(), targetUrl, applicationStatusService.getInputDir(),
 						applicationStatusService.getOutputDir(), username, password);
-				restClient = ClientFactory.newRestClient(testPackage.getApplicationName(), targetUrl, username, password);
+				restClient = ClientFactory.newRestClient(testPackage.getApplicationName(), storageService, targetUrl, username, password);
 				action.executeWithRandomDelay(webClient, restClient);
 				if (log.isDebugEnabled() && new Date().getTime() % 10 == 0) {
 					String screenshotPath = webClient.takeScreenshot("afteraction-" + action.getClass().getSimpleName());

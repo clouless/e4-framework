@@ -1,6 +1,7 @@
 package de.scandio.e4.worker.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 

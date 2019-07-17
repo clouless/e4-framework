@@ -4,6 +4,7 @@ import de.scandio.e4.worker.client.ApplicationName;
 import de.scandio.e4.worker.factories.ClientFactory;
 import de.scandio.e4.worker.interfaces.RestClient;
 import de.scandio.e4.worker.interfaces.WebClient;
+import de.scandio.e4.worker.services.StorageService;
 import org.apache.commons.lang3.StringUtils;
 
 public class E4TestEnv {
@@ -47,7 +48,7 @@ public class E4TestEnv {
 	}
 
 	public static RestClient newAdminTestRestClient() {
-		return ClientFactory.newRestClient(APPLICATION_NAME, APPLICATION_BASE_URL,
+		return ClientFactory.newRestClient(APPLICATION_NAME, null,APPLICATION_BASE_URL,
 				USER_NAME, USER_PASSWORD);
 	}
 }

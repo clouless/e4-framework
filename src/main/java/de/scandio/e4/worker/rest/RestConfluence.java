@@ -1,16 +1,14 @@
 package de.scandio.e4.worker.rest;
 
 import com.google.gson.Gson;
+import de.scandio.e4.worker.services.StorageService;
 import de.scandio.e4.worker.util.WorkerUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RestConfluence extends RestAtlassian {
 
@@ -20,8 +18,8 @@ public class RestConfluence extends RestAtlassian {
 
 	private Map<String, Long> contentIds = new HashMap<>();
 
-	public RestConfluence(String baseUrl, String username, String password) {
-		super(baseUrl, username, password);
+	public RestConfluence(StorageService storageService, String baseUrl, String username, String password) {
+		super(storageService, baseUrl, username, password);
 	}
 
 	public String findPage(String spaceKey, String title) {
@@ -58,14 +56,20 @@ public class RestConfluence extends RestAtlassian {
 		return findContentIds(limit, "page", null);
 	}
 
-	public List<Long> findBlogposts(int limit) {
-		return findContentIds(limit, "blogpost", null);
-	}
-
 	public Long getRandomContentId() {
-		return getRandomContentId(null, null);
-	}
+		Long randomContentId = null;
+		if (this.storageService != null) {
+			List<Long> contentIdsForUser = storageService.getRandomEntityIdsForUser(this.username);
+			if (contentIdsForUser != null && !contentIdsForUser.isEmpty()) {
+				randomContentId = WorkerUtils.getRandomItem(contentIdsForUser);
+			}
+		}
+		if (randomContentId == null) {
+			randomContentId = getRandomContentId(null, null);
+		}
 
+		return randomContentId;
+	}
 
 	public Long getRandomContentId(String spaceKey, String parentPageTitle) {
 		Long contentId;
@@ -90,6 +94,11 @@ public class RestConfluence extends RestAtlassian {
 	public List<String> getUsernames() {
 		String body = sendGetRequestReturnBody("rest/api/group/confluence-users/member");
 		return getListFromResponse(String.class, "username", body);
+	}
+
+	@Override
+	public List<Long> getRandomEntityIds(int limit) {
+		return findContentIds(limit, "page", null);
 	}
 
 	private <T> List<T> getListFromResponse(Class<T> clazz, String key, String responseText) {

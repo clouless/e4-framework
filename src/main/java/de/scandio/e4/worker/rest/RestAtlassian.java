@@ -2,6 +2,7 @@ package de.scandio.e4.worker.rest;
 
 import com.google.gson.Gson;
 import de.scandio.e4.worker.interfaces.RestClient;
+import de.scandio.e4.worker.services.StorageService;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,8 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.Null;
 import java.time.Duration;
 import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
@@ -31,7 +34,11 @@ public abstract class RestAtlassian implements RestClient {
 	protected String password;
 	protected String baseUrl;
 
-	public RestAtlassian(String baseUrl, String username, String password) {
+	@Nullable
+	protected StorageService storageService;
+
+	public RestAtlassian(StorageService storageService, String baseUrl, String username, String password) {
+		this.storageService = storageService;
 		this.baseUrl = baseUrl;
 		this.username = username;
 		this.password = password;
