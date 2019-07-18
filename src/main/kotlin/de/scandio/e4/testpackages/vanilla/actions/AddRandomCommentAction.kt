@@ -17,7 +17,7 @@ class AddRandomCommentAction : Action() {
         val webConfluence = webClient as WebConfluence
         val restConfluence = restClient as RestConfluence
         // IMPORTANT: do this before measuring because it invokes a REST call!
-        val randomContentId = restConfluence.getRandomContentId()
+        val randomContentId = restConfluence.randomContentId
         webConfluence.login()
         webConfluence.goToPage(randomContentId)
         val randomHtml10Words = "<p>${RandomData.getRandomString(10)}</p>"

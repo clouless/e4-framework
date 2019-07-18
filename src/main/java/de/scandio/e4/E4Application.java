@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 @SpringBootApplication
 public class E4Application {
@@ -16,6 +17,8 @@ public class E4Application {
 	public static void main(String[] args) {
 		final CommandLine parsedArgs = parseArgs(args);
 		java.security.Security.setProperty("networkaddress.cache.ttl" , "60");
+		System.setProperty("webdriver.chrome.silentOutput", "true");
+		java.util.logging.Logger.getLogger("org.openqa.selenium").setLevel(Level.OFF);
 
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			log.info("Shutdown signal received.. shutting down threads.");

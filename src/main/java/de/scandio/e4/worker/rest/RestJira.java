@@ -16,9 +16,4 @@ public class RestJira extends RestAtlassian {
 		return null;
 	}
 
-	@Override
-	public List<Long> getRandomEntityIds(int limit) {
-		return null;
-	}
-
 }

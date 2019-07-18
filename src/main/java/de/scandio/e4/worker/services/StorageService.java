@@ -26,13 +26,13 @@ public class StorageService {
 	private Connection connection;
 	private final String databaseFilePath;
 
-	private Map<String, List<Long>> userRandomEntityIds;
+	private Map<String, List<Long>> idsForKey;
 
 	public StorageService(ApplicationStatusService applicationStatusService) throws Exception {
 		this.applicationStatusService = applicationStatusService;
 		String databaseFileName = "e4-" + new Date().getTime() + ".sqlite";
 		this.databaseFilePath = "jdbc:sqlite:" + this.applicationStatusService.getOutputDir() + "/" + databaseFileName;
-		this.userRandomEntityIds = new HashMap<>();
+		this.idsForKey = new HashMap<>();
 		initDatabase();
 	}
 
@@ -124,11 +124,11 @@ public class StorageService {
 	}
 
 	@Nullable
-	public List<Long> getRandomEntityIdsForUser(String username) {
-		return userRandomEntityIds.get(username);
+	public List<Long> getIdsByKey(String key) {
+		return idsForKey.get(key);
 	}
 
-	public void setRandomEntityIdsForUser(String username, List<Long> entityIds) {
-		this.userRandomEntityIds.put(username, entityIds);
+	public void setIdsForKey(String key, List<Long> entityIds) {
+		this.idsForKey.put(key, entityIds);
 	}
 }

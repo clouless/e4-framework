@@ -10,8 +10,8 @@ import java.util.*
 
 
 open class ViewRandomContent(
-        val spaceKey: String = "",
-        val parentPageTitle: String = ""
+        val spaceKey: String? = null,
+        val parentPageTitle: String? = null
 ) : Action() {
 
     private val log = LoggerFactory.getLogger(javaClass)

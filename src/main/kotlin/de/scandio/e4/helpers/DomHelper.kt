@@ -16,7 +16,7 @@ import java.time.Duration
 
 class DomHelper(
         val driver: WebDriver,
-        var defaultDuration: Long = 20,
+        var defaultDuration: Long = 40,
         var defaultWaitTillPresent: Long = 10,
         var screenshotBeforeClick: Boolean = false,
         var screenshotBeforeInsert: Boolean = false,

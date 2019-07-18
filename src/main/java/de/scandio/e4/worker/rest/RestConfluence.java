@@ -1,6 +1,5 @@
 package de.scandio.e4.worker.rest;
 
-import com.google.gson.Gson;
 import de.scandio.e4.worker.services.StorageService;
 import de.scandio.e4.worker.util.WorkerUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +13,7 @@ public class RestConfluence extends RestAtlassian {
 
 	private static final Logger log = LoggerFactory.getLogger(RestConfluence.class);
 
-	private static final Gson GSON = new Gson();
+	private static final int REST_ENTITY_SEARCH_LIMIT = 100;
 
 	private Map<String, Long> contentIds = new HashMap<>();
 
@@ -22,24 +21,61 @@ public class RestConfluence extends RestAtlassian {
 		super(storageService, baseUrl, username, password);
 	}
 
-	public String findPage(String spaceKey, String title) {
+	private String findPage(String spaceKey, String title) {
 		String urlAfterBaseUrl = String.format("rest/api/content?title=%s&spaceKey=%s", title, spaceKey);
+		log.info("[REST] obtaining page data for spaceKey {{}} and title {{}}", spaceKey, title);
 		return sendGetRequestReturnBody(urlAfterBaseUrl);
 	}
 
-	public List<Long> findContentIds(int limit, String type, String spaceKey) {
-		String url = "rest/api/content?start=0&limit=%s";
-		if (type != null && spaceKey != null) {
-			url = String.format(url + "&type=%s&spaceKey=%s", limit, type, spaceKey);
-		} else if (spaceKey != null) {
-			url = String.format(url + "&spaceKey=%s", limit, spaceKey);
-		} else if (type != null) {
-			url = String.format(url + "&type=%s", limit, type);
-		} else {
-			url = String.format(url, limit);
+	private List<Long> findChildPageIdsUseCache(String spaceKey, String parentPageTitle) {
+		List<Long> ids = null;
+		String cacheKey = this.username + ":" + spaceKey + ":" + parentPageTitle;
+		if (this.storageService != null) {
+			ids = this.storageService.getIdsByKey(cacheKey);
 		}
-		String body = sendGetRequestReturnBody(url);
-		return getContentIdsFromResponse(body);
+
+		if (ids == null) {
+			Long parentContentId = getPageIdUseCache(spaceKey, parentPageTitle);
+			String restUrl = "rest/api/content/"+parentContentId+"/child/page";
+			log.info("[REST] obtaining child page ids for user {{}}, spaceKey {{}}, parentPage {{}}", this.username, spaceKey, parentPageTitle);
+			String responseText = sendGetRequestReturnBody(restUrl);
+			ids = getContentIdsFromResponse(responseText);
+			if (this.storageService != null) {
+				this.storageService.setIdsForKey(cacheKey, ids);
+			}
+		}
+
+		return ids;
+	}
+
+	private List<Long> findContentIdsUseCache(int limit, String type, String spaceKey) {
+		List<Long> ids = null;
+		String cacheKey = this.username + ":" + type + ":" + spaceKey + ":" + limit;
+		if (this.storageService != null) {
+			ids = this.storageService.getIdsByKey(cacheKey);
+		}
+
+		if (ids == null) {
+			String url = "rest/api/content?start=0&limit=%s";
+			if (type != null && spaceKey != null) {
+				url = String.format(url + "&type=%s&spaceKey=%s", limit, type, spaceKey);
+			} else if (spaceKey != null) {
+				url = String.format(url + "&spaceKey=%s", limit, spaceKey);
+			} else if (type != null) {
+				url = String.format(url + "&type=%s", limit, type);
+			} else {
+				url = String.format(url, limit);
+			}
+
+			log.info("[REST] findContentIds for user {{}}, type {{}}, spaceKey {{}}", this.username, type, spaceKey);
+			String body = sendGetRequestReturnBody(url);
+			ids = getContentIdsFromResponse(body);
+			if (this.storageService != null) {
+				this.storageService.setIdsForKey(cacheKey, ids);
+			}
+		}
+
+		return ids;
 	}
 
 	private List<Long> getContentIdsFromResponse(String body) {
@@ -52,53 +88,27 @@ public class RestConfluence extends RestAtlassian {
 		return ids;
 	}
 
-	public List<Long> findPages(int limit) {
-		return findContentIds(limit, "page", null);
+	public void fillCachesIfEmpty() {
+		findContentIdsUseCache(REST_ENTITY_SEARCH_LIMIT, null, null);
 	}
 
 	public Long getRandomContentId() {
-		Long randomContentId = null;
-		if (this.storageService != null) {
-			List<Long> contentIdsForUser = storageService.getRandomEntityIdsForUser(this.username);
-			if (contentIdsForUser != null && !contentIdsForUser.isEmpty()) {
-				randomContentId = WorkerUtils.getRandomItem(contentIdsForUser);
-			}
-		}
-		if (randomContentId == null) {
-			randomContentId = getRandomContentId(null, null);
-		}
-
-		return randomContentId;
+		return getRandomContentId(null, null);
 	}
 
 	public Long getRandomContentId(String spaceKey, String parentPageTitle) {
 		Long contentId;
 		if (StringUtils.isBlank(parentPageTitle)) {
-			contentId = WorkerUtils.getRandomItem(findContentIds(100, null, spaceKey));
+			contentId = WorkerUtils.getRandomItem(findContentIdsUseCache(REST_ENTITY_SEARCH_LIMIT, null, spaceKey));
 		} else {
-			contentId = WorkerUtils.getRandomItem(findChildPageIds(spaceKey, parentPageTitle));
+			contentId = WorkerUtils.getRandomItem(findChildPageIdsUseCache(spaceKey, parentPageTitle));
 		}
 		return contentId;
-	}
-
-	private List<Long> findChildPageIds(String spaceKey, String parentPageTitle) {
-		Long parentContentId = contentIds.get(spaceKey + ":" + parentPageTitle);
-		if (parentContentId == null) {
-			parentContentId = getPageId(spaceKey, parentPageTitle);
-		}
-		String restUrl = "rest/api/content/"+parentContentId+"/child/page";
-		String responseText = sendGetRequestReturnBody(restUrl);
-		return getContentIdsFromResponse(responseText);
 	}
 
 	public List<String> getUsernames() {
 		String body = sendGetRequestReturnBody("rest/api/group/confluence-users/member");
 		return getListFromResponse(String.class, "username", body);
-	}
-
-	@Override
-	public List<Long> getRandomEntityIds(int limit) {
-		return findContentIds(limit, "page", null);
 	}
 
 	private <T> List<T> getListFromResponse(Class<T> clazz, String key, String responseText) {
@@ -119,7 +129,7 @@ public class RestConfluence extends RestAtlassian {
 		content = StringEscapeUtils.escapeJson(content);
 		String bodyTemplate, body;
 		if (StringUtils.isNotBlank(parentPageTitle)) {
-			long parentPageId = getPageId(spaceKey, parentPageTitle);
+			long parentPageId = getPageIdUseCache(spaceKey, parentPageTitle);
 			bodyTemplate = "{\"type\":\"page\",\"ancestors\":[{\"id\":%s}],\"title\":\"%s\",\"space\":{\"key\":\"%s\"},\"body\":{\"storage\":{\"value\":\"%s\",\"representation\":\"storage\"}}}";
 			body = String.format(bodyTemplate, parentPageId, pageTitle, spaceKey, content);
 		} else {
@@ -129,10 +139,16 @@ public class RestConfluence extends RestAtlassian {
 		return sendPostRequest("rest/api/content/", body);
 	}
 
-	public Long getPageId(String spaceKey, String pageTitle) {
-		String responseText = findPage(spaceKey, pageTitle);
-		List<Map> pages = getResultListFromResponse(responseText);
-		return Long.parseLong((String) pages.get(0).get("id"));
+	private Long getPageIdUseCache(String spaceKey, String pageTitle) {
+		String cacheKey = spaceKey + ":" + pageTitle;
+		Long pageId = contentIds.get(cacheKey);
+		if (pageId == null) {
+			String responseText = findPage(spaceKey, pageTitle);
+			List<Map> pages = getResultListFromResponse(responseText);
+			pageId = Long.parseLong((String) pages.get(0).get("id"));
+			contentIds.put(spaceKey + ":" + pageTitle, pageId);
+		}
+		return pageId;
 	}
 
 	public String createSpace(String spaceKey, String spaceName) {
