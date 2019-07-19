@@ -462,8 +462,8 @@ then
         start_instance_confluencenode $node_id
         if [[ "${node_id}" = "1" ]];
         then
-          echo ">>> Wait for 30sec after start of Node = 1"
-          sleep 30
+          echo ">>> Wait for 60sec after start of Node = 1"
+          sleep 60
         else
           echo ">>> No need to wait after start of Node != 1"
         fi

@@ -51,8 +51,8 @@ echo -e "CATALINA_OPTS=\"-Dsynchrony.service.url=http://confluence-cluster-${CON
 echo -e "\nexport CATALINA_OPTS" >> /confluence/atlassian-confluence-latest/bin/setenv.sh
 
 # BEGIN: edit
-#sed -i 's/Xmx1024/Xmx6144/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
-#sed -i 's/Xms1024/Xms6144/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
+sed -i 's/Xmx1024/Xmx8192/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
+sed -i 's/Xms1024/Xms8192/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
 # END: edit
 
 #
@@ -85,19 +85,11 @@ then
   curl --connect-timeout 180 --max-time 180 --fail -o /tmp/confluence-home.tar  http://confluence-cluster-${CONFLUENCE_VERSION_DOT_FREE}-node1:8888/download
   tar xfv /tmp/confluence-home.tar -C /
   chown -R worker:worker /confluence-home
-  # If this is not node 1, set heap to 4GB
-  echo ">>> Node ID != 1. Setting heap to 4GB"
-  sed -i 's/Xmx1024/Xmx4096/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
-  sed -i 's/Xms1024/Xms4096/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
 else
   #
   # NODE 1
   #
   echo ">> docker-entrypoint: starting confluence home sync server on port 8888"
-  # If this is node 1, set heap to 8GB
-  echo ">>> Node ID = 1. Setting heap to 8GB"
-  sed -i 's/Xmx1024/Xmx8192/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
-  sed -i 's/Xms1024/Xms8192/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
   #BEGIN: edit
   if [[ -d /e4prov/$E4_PROV_KEY ]];
   then
