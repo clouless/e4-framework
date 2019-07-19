@@ -5,7 +5,7 @@ set -e
 umask u+rxw,g+rwx,o-rwx
 
 # BEGIN: EDIT
-# Given by --env: $E4_PROV_KEY, $CONFLUENCE_VERSION
+# Given by --env: $E4_PROV_KEY, $CONFLUENCE_VERSION, $E4_NODE_HEAP
 CONFLUENCE_VERSION_DOT_FREE=${CONFLUENCE_VERSION//\./}
 # END: EDIT
 
@@ -51,8 +51,9 @@ echo -e "CATALINA_OPTS=\"-Dsynchrony.service.url=http://confluence-cluster-${CON
 echo -e "\nexport CATALINA_OPTS" >> /confluence/atlassian-confluence-latest/bin/setenv.sh
 
 # BEGIN: edit
-sed -i 's/Xmx1024/Xmx8192/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
-sed -i 's/Xms1024/Xms8192/g' /confluence/atlassian-confluence-latest/bin/setenv.sh
+echo "Node will start with a heap space of $E4_NODE_HEAP MB"
+sed -i "s/Xmx1024/Xmx$E4_NODE_HEAP/g" /confluence/atlassian-confluence-latest/bin/setenv.sh
+sed -i "s/Xms1024/Xms$E4_NODE_HEAP/g" /confluence/atlassian-confluence-latest/bin/setenv.sh
 # END: edit
 
 #
