@@ -66,6 +66,8 @@ return_by_reference() {
 }
 
 contains() {
+    echo "checking for string $2 in..."
+    echo $1
     string="$1"
     substring="$2"
     if test "${string#*$substring}" != "$string"
