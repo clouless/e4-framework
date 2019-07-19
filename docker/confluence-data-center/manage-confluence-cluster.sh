@@ -65,6 +65,33 @@ return_by_reference() {
     fi
 }
 
+contains() {
+    #echo "checking for string $2 in..."
+    #echo $1
+    string="$1"
+    substring="$2"
+    if test "${string#*$substring}" != "$string"
+    then
+        return 0    # $substring is in $string
+    else
+        return 1    # $substring is not in $string
+    fi
+}
+
+wait_for_logs_to_contain() {
+    while : ; do
+      log_content=$(docker logs $(docker ps -qf "name=confluence-cluster-6153-$1") 2>&1)
+      if contains "$log_content" "$2"
+      then
+        echo ""
+        break
+      else
+        echo -n "."
+        sleep 3
+      fi
+    done
+}
+
 # Returns 1 if the container is running and 0 if not
 #
 # @usage `_is_named_container_running 'foo' $result` passed variable `result` contains return value
@@ -144,6 +171,7 @@ function start_instance_confluencenode {
         --env NODE_NUMBER=${1} \
         --env E4_PROV_KEY=$E4_PROV_KEY \
         --env E4_PROV_DIR=$E4_PROV_DIR \
+        --env E4_NODE_HEAP=$E4_NODE_HEAP \
         -v confluence-shared-home-${CONFLUENCE_VERSION_DOT_FREE}:/confluence-shared-home \
         -p "500$1:500$1" \
         -p "433$1:433$1" \
@@ -335,6 +363,10 @@ case $key in
     E4_PROV_KEY="$2"
     shift
     ;;
+    -h|--nodeheap)
+    E4_NODE_HEAP="$2"
+    shift
+    ;;
     *)
        # unknown option
     ;;
@@ -382,6 +414,13 @@ else
         echo -e $C_RED">> param error ........: Please specify scale as parameter -s or --scale. E.g. --scale 3"$C_RST
         EXIT=1
     fi
+
+    if [[ ("$ACTION" == "create" || "$ACTION" == "update") && ! $E4_NODE_HEAP ]]
+    then
+        echo -e $C_RED">> param error ........: Please specify node heap as parameter -h or --nodeheap. E.g. --nodeheap 2048"$C_RST
+        EXIT=1
+    fi
+
     if [[ "$ACTION" == "restart-node" && ! $NODE_ID ]]
     then
         echo -e $C_RED">> param error ........: Please specify id as parameter -i or --id. E.g. --id3"$C_RST
@@ -453,8 +492,9 @@ then
     start_instance_loadbalancer $SCALE
     echo ""
 
-    echo ">>> Waiting for 40sec for database restore"
-    sleep 40
+    echo ">>> Wait for database init to complete"
+    wait_for_logs_to_contain "db" "E4 postgres-init DONE"
+    sleep 5
 
     for (( node_id=1; node_id<=$SCALE; node_id++ ))
     do
@@ -462,14 +502,15 @@ then
         start_instance_confluencenode $node_id
         if [[ "${node_id}" = "1" ]];
         then
-          echo ">>> Wait for 30sec after start of Node = 1"
-          sleep 30
-        else
-          echo ">>> No need to wait after start of Node != 1"
+          echo ">>> Wait for node 1 to be fully started"
+          wait_for_logs_to_contain "node1" "Server startup in"
         fi
 	echo ""
     done
     echo ""
+
+    echo ">>> Wait for last node (node $SCALE) to be fully started"
+    wait_for_logs_to_contain "node$SCALE" "Server startup in"
 
     print_cluster_ready_info
     echo ""
