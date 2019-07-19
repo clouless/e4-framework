@@ -77,10 +77,16 @@ contains() {
 }
 
 wait_for_logs_to_contain() {
-    while ! contains $(docker logs $(docker ps -qf "name=confluence-cluster-6153-$1")) "$2";
-    do
-      echo "."
-      sleep 5
+    while : ; do
+      docker logs $(docker ps -qf "name=confluence-cluster-6153-$1") > tmp.txt
+      if contains $(cat tmp.txt) $2
+      then
+        rm tmp.txt
+        break
+      else
+        echo "."
+        sleep 5
+      fi
     done
 }
 
