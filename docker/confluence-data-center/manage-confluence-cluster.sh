@@ -65,6 +65,25 @@ return_by_reference() {
     fi
 }
 
+contains() {
+    string="$1"
+    substring="$2"
+    if test "${string#*$substring}" != "$string"
+    then
+        return 0    # $substring is in $string
+    else
+        return 1    # $substring is not in $string
+    fi
+}
+
+wait_for_logs_to_contain() {
+    while ! contains $(docker logs $(docker ps -qf "name=confluence-cluster-6153-$1")) "$2";
+    do
+      echo "."
+      sleep 5
+    done
+}
+
 # Returns 1 if the container is running and 0 if not
 #
 # @usage `_is_named_container_running 'foo' $result` passed variable `result` contains return value
@@ -453,8 +472,8 @@ then
     start_instance_loadbalancer $SCALE
     echo ""
 
-    echo ">>> Waiting for 40sec for database restore"
-    sleep 40
+    echo ">>> Wait for database init to complete"
+    wait_for_logs_to_contain "db" "database system is ready to accept connections"
 
     for (( node_id=1; node_id<=$SCALE; node_id++ ))
     do
@@ -462,8 +481,8 @@ then
         start_instance_confluencenode $node_id
         if [[ "${node_id}" = "1" ]];
         then
-          echo ">>> Wait for 60sec after start of Node = 1"
-          sleep 60
+          echo ">>> Wait for node 1 to be fully started"
+          wait_for_logs_to_contain "node1" "Server startup in"
         else
           echo ">>> No need to wait after start of Node != 1"
         fi
